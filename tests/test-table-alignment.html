@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLM Table Alignment Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #3b82f6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --text-primary: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --bg-dark: #0f172a;
+      --bg-darker: #020617;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-darker);
+      color: var(--text-primary);
+      padding: 20px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+
+    .position-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .position-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+
+    .position-header-row .position-header {
+      width: 200px;
+    }
+
+    .position-header-row .position-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .position-header-row .price-range-container {
+      width: 280px;
+    }
+
+    .header-label {
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .position-item {
+      background: var(--bg-darker);
+      border-radius: 4px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .position-item:hover {
+      border-color: var(--primary);
+      background: var(--bg-card);
+    }
+
+    .position-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 200px;
+      flex-shrink: 0;
+    }
+
+    .position-pair {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .position-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      width: 20px;
+    }
+
+    .position-badge.in-range {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .position-badge.out-of-range {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .position-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .position-detail {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      min-width: fit-content;
+    }
+
+    /* Fixed widths for table-like alignment */
+    .position-detail.balance {
+      width: 100px;
+      text-align: right;
+    }
+
+    .position-detail.token {
+      width: 240px;
+      min-width: 240px;
+    }
+
+    .position-detail.yield {
+      width: 80px;
+      text-align: right;
+    }
+
+    .position-detail.apy {
+      width: 70px;
+      text-align: right;
+    }
+
+    .detail-value {
+      color: var(--text-primary);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-range-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      width: 280px;
+    }
+
+    .current-price-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      width: 90px;
+    }
+
+    .current-price-value {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.6875rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-range-slider {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      flex-shrink: 0;
+      flex: 1;
+    }
+
+    .price-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      width: 50px;
+    }
+
+    .price-label:first-child {
+      text-align: right;
+    }
+
+    .slider-track {
+      width: 80px;
+      height: 6px;
+      background: var(--bg-darker);
+      border-radius: 3px;
+      position: relative;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .slider-fill {
+      position: absolute;
+      height: 100%;
+      background: linear-gradient(90deg, var(--success) 0%, var(--danger) 100%);
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+
+    .slider-tick {
+      position: absolute;
+      width: 2px;
+      height: 10px;
+      background: var(--text-primary);
+      border-radius: 1px;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .slider-tick::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--text-primary);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 1px var(--bg-card);
+    }
+
+    .slider-tick.in-range::after {
+      background: var(--success);
+    }
+
+    .test-info {
+      background: var(--bg-darker);
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .test-info h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: var(--primary);
+    }
+
+    .test-info ul {
+      margin-left: 20px;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .test-info li {
+      margin-bottom: 5px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .status.pass {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CLM Positions Table - Alignment Test</h1>
+
+    <div class="test-info">
+      <h2>Test Cases <span class="status pass">UPDATED</span></h2>
+      <ul>
+        <li>Token columns increased from 140px to <strong>240px</strong> to accommodate long numbers</li>
+        <li>Balance column increased from 90px to <strong>100px</strong> with right-alignment</li>
+        <li>Yield and APY columns right-aligned for better number readability</li>
+        <li>Item gap increased from 8px to <strong>12px</strong> for better spacing</li>
+        <li>Position header increased from 180px to <strong>200px</strong></li>
+        <li>Testing with various data lengths to ensure no wrapping</li>
+      </ul>
+    </div>
+
+    <div class="position-list">
+      <!-- Header Row -->
+      <div class="position-header-row">
+        <div class="position-header">
+          <span class="header-label">Pair</span>
+        </div>
+        <div class="position-details">
+          <div class="position-detail balance">
+            <span class="header-label">Balance</span>
+          </div>
+          <div class="position-detail token">
+            <span class="header-label">Token 0</span>
+          </div>
+          <div class="position-detail token">
+            <span class="header-label">Token 1</span>
+          </div>
+          <div class="position-detail yield">
+            <span class="header-label">Yield</span>
+          </div>
+          <div class="position-detail apy">
+            <span class="header-label">APY</span>
+          </div>
+        </div>
+        <div class="price-range-container">
+          <span class="header-label">Price Range</span>
+        </div>
+      </div>
+
+      <!-- Test Case 1: Your Example - SOL/USDC -->
+      <div class="position-item">
+        <div class="position-header">
+          <div class="position-pair">SOL/USDC <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· Orca · 2h ago</span></div>
+          <span class="position-badge in-range">✓</span>
+        </div>
+        <div class="position-details">
+          <div class="position-detail balance">
+            <span class="detail-value">$18,723</span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">95.0146 <span style="color: var(--text-muted); font-size: 0.625rem;">($13,444 • 72%)</span></span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">5,280.08 <span style="color: var(--text-muted); font-size: 0.625rem;">($5,279 • 28%)</span></span>
+          </div>
+          <div class="position-detail yield">
+            <span class="detail-value">$426</span>
+          </div>
+          <div class="position-detail apy">
+            <span class="detail-value">73.9%</span>
+          </div>
+        </div>
+        <div class="price-range-container">
+          <span class="current-price-label"><span class="current-price-value">141.4804</span></span>
+          <div class="price-range-slider">
+            <span class="price-label">126.654</span>
+            <div class="slider-track">
+              <div class="slider-fill" style="width: 100%;"></div>
+              <div class="slider-tick in-range" style="left: 35%;"></div>
+            </div>
+            <span class="price-label">190.0027</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Case 2: Large Numbers -->
+      <div class="position-item">
+        <div class="position-header">
+          <div class="position-pair">USDC/STRK <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· Ekubo · 5h ago</span></div>
+          <span class="position-badge in-range">✓</span>
+        </div>
+        <div class="position-details">
+          <div class="position-detail balance">
+            <span class="detail-value">$8,554</span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">1,192,405.97 <span style="color: var(--text-muted); font-size: 0.625rem;">($4,277 • 49%)</span></span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">4,277.19 <span style="color: var(--text-muted); font-size: 0.625rem;">($4,277 • 51%)</span></span>
+          </div>
+          <div class="position-detail yield">
+            <span class="detail-value">$123</span>
+          </div>
+          <div class="position-detail apy">
+            <span class="detail-value">45.2%</span>
+          </div>
+        </div>
+        <div class="price-range-container">
+          <span class="current-price-label"><span class="current-price-value">96,311.28</span></span>
+          <div class="price-range-slider">
+            <span class="price-label">90,870</span>
+            <div class="slider-track">
+              <div class="slider-fill" style="width: 100%;"></div>
+              <div class="slider-tick in-range" style="left: 50%;"></div>
+            </div>
+            <span class="price-label">115,700</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Case 3: Out of Range -->
+      <div class="position-item">
+        <div class="position-header">
+          <div class="position-pair">ETH/USDC <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· Uniswap · 12h ago</span></div>
+          <span class="position-badge out-of-range">✗</span>
+        </div>
+        <div class="position-details">
+          <div class="position-detail balance">
+            <span class="detail-value">$45,890</span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">12.4567 <span style="color: var(--text-muted); font-size: 0.625rem;">($38,234 • 83%)</span></span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">7,656.23 <span style="color: var(--text-muted); font-size: 0.625rem;">($7,656 • 17%)</span></span>
+          </div>
+          <div class="position-detail yield">
+            <span class="detail-value">$1,234</span>
+          </div>
+          <div class="position-detail apy">
+            <span class="detail-value">89.3%</span>
+          </div>
+        </div>
+        <div class="price-range-container">
+          <span class="current-price-label"><span class="current-price-value">3,067.45</span></span>
+          <div class="price-range-slider">
+            <span class="price-label">2,800</span>
+            <div class="slider-track">
+              <div class="slider-fill" style="width: 100%;"></div>
+              <div class="slider-tick in-range" style="left: 67%;"></div>
+            </div>
+            <span class="price-label">3,200</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Case 4: Small Decimals -->
+      <div class="position-item">
+        <div class="position-header">
+          <div class="position-pair">BTC/USDC <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· Aerodrome · 1d ago</span></div>
+          <span class="position-badge in-range">✓</span>
+        </div>
+        <div class="position-details">
+          <div class="position-detail balance">
+            <span class="detail-value">$125,000</span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">0.8234 <span style="color: var(--text-muted); font-size: 0.625rem;">($78,125 • 62%)</span></span>
+          </div>
+          <div class="position-detail token">
+            <span class="detail-value">46,875.00 <span style="color: var(--text-muted); font-size: 0.625rem;">($46,875 • 38%)</span></span>
+          </div>
+          <div class="position-detail yield">
+            <span class="detail-value">$2,500</span>
+          </div>
+          <div class="position-detail apy">
+            <span class="detail-value">124.5%</span>
+          </div>
+        </div>
+        <div class="price-range-container">
+          <span class="current-price-label"><span class="current-price-value">94,876.12</span></span>
+          <div class="price-range-slider">
+            <span class="price-label">90,000</span>
+            <div class="slider-track">
+              <div class="slider-fill" style="width: 100%;"></div>
+              <div class="slider-tick in-range" style="left: 45%;"></div>
+            </div>
+            <span class="price-label">105,000</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

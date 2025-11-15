@@ -1,0 +1,774 @@
+{
+  "id": "capture_1761609204831_xl16j2126",
+  "url": "https://www.orca.so/portfolio",
+  "title": "Orca | Portfolio",
+  "timestamp": "2025-10-27T23:53:24.83+00:00",
+  "protocol": "Orca",
+  "data": {
+    "url": "https://www.orca.so/portfolio",
+    "path": "/portfolio",
+    "title": "Orca | Portfolio",
+    "domain": "www.orca.so",
+    "content": {
+      "text": {
+        "allText": [],
+        "headings": {}
+      },
+      "forms": [],
+      "links": [
+        {
+          "href": "https://www.orca.so/privacy-policy",
+          "text": "Privacy Policy",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/cookies-policy",
+          "text": "Cookie Policy",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/",
+          "text": "",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/",
+          "text": "Trade",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/pools",
+          "text": "Pools",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/portfolio",
+          "text": "Portfolio",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/stake",
+          "text": "Stake",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/tokens",
+          "text": "Wavebreak",
+          "isExternal": false
+        },
+        {
+          "href": "https://solscan.io/token/So11111111111111111111111111111111111111112",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/AvZZF1YaZDziPY2RCK4oJrRVrbN3mTD9NL24hPeaZeUj",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://solscan.io/token/cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+          "text": "",
+          "isExternal": true
+        },
+        {
+          "href": "https://jobs.ashbyhq.com/orca",
+          "text": "Careers",
+          "isExternal": true
+        },
+        {
+          "href": "https://www.orca.so/",
+          "text": "",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/pools",
+          "text": "",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/portfolio",
+          "text": "",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/stake",
+          "text": "",
+          "isExternal": false
+        },
+        {
+          "href": "https://www.orca.so/tokens",
+          "text": "",
+          "isExternal": false
+        }
+      ],
+      "media": {
+        "audios": [],
+        "videos": [],
+        "iframes": [
+          {
+            "src": "https://www.google.com/recaptcha/enterprise/anchor?ar=1&k=6LfI-l8rAAAAANFOE5niDrO8PEvuqHfvddN-4SNw&co=aHR0cHM6Ly93d3cub3JjYS5zbzo0NDM.&hl=en&v=-PgDGgfmUF0ySmnjMTJjzqak&size=invisible&anchor-ms=20000&execute-ms=15000&cb=3cubaua4ds9",
+            "title": "reCAPTCHA",
+            "width": "256",
+            "height": "60"
+          },
+          {
+            "src": "",
+            "title": "",
+            "width": "",
+            "height": ""
+          }
+        ]
+      },
+      "images": [
+        {
+          "alt": "Phantom",
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTA4IiBoZWlnaHQ9IjEwOCIgdmlld0JveD0iMCAwIDEwOCAxMDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDgiIGhlaWdodD0iMTA4IiByeD0iMjYiIGZpbGw9IiNBQjlGRjIiLz4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik00Ni41MjY3IDY5LjkyMjlDNDIuMDA1NCA3Ni44NTA5IDM0LjQyOTIgODUuNjE4MiAyNC4zNDggODUuNjE4MkMxOS41ODI0IDg1LjYxODIgMTUgODMuNjU2MyAxNSA3NS4xMzQyQzE1IDUzLjQzMDUgNDQuNjMyNiAxOS44MzI3IDcyLjEyNjggMTkuODMyN0M4Ny43NjggMTkuODMyNyA5NCAzMC42ODQ2IDk0IDQzLjAwNzlDOTQgNTguODI1OCA4My43MzU1IDc2LjkxMjIgNzMuNTMyMSA3Ni45MTIyQzcwLjI5MzkgNzYuOTEyMiA2OC43MDUzIDc1LjEzNDIgNjguNzA1MyA3Mi4zMTRDNjguNzA1MyA3MS41NzgzIDY4LjgyNzUgNzAuNzgxMiA2OS4wNzE5IDY5LjkyMjlDNjUuNTg5MyA3NS44Njk5IDU4Ljg2ODUgODEuMzg3OCA1Mi41NzU0IDgxLjM4NzhDNDcuOTkzIDgxLjM4NzggNDUuNjcxMyA3OC41MDYzIDQ1LjY3MTMgNzQuNDU5OEM0NS42NzEzIDcyLjk4ODQgNDUuOTc2OCA3MS40NTU2IDQ2LjUyNjcgNjkuOTIyOVpNODMuNjc2MSA0Mi41Nzk0QzgzLjY3NjEgNDYuMTcwNCA4MS41NTc1IDQ3Ljk2NTggNzkuMTg3NSA0Ny45NjU4Qzc2Ljc4MTYgNDcuOTY1OCA3NC42OTg5IDQ2LjE3MDQgNzQuNjk4OSA0Mi41Nzk0Qzc0LjY5ODkgMzguOTg4NSA3Ni43ODE2IDM3LjE5MzEgNzkuMTg3NSAzNy4xOTMxQzgxLjU1NzUgMzcuMTkzMSA4My42NzYxIDM4Ljk4ODUgODMuNjc2MSA0Mi41Nzk0Wk03MC4yMTAzIDQyLjU3OTVDNzAuMjEwMyA0Ni4xNzA0IDY4LjA5MTYgNDcuOTY1OCA2NS43MjE2IDQ3Ljk2NThDNjMuMzE1NyA0Ny45NjU4IDYxLjIzMyA0Ni4xNzA0IDYxLjIzMyA0Mi41Nzk1QzYxLjIzMyAzOC45ODg1IDYzLjMxNTcgMzcuMTkzMSA2NS43MjE2IDM3LjE5MzFDNjguMDkxNiAzNy4xOTMxIDcwLjIxMDMgMzguOTg4NSA3MC4yMTAzIDQyLjU3OTVaIiBmaWxsPSIjRkZGREY4Ii8+Cjwvc3ZnPgo=",
+          "title": "",
+          "width": 108,
+          "height": 108
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/bafkreibyb3hcn7gglvdqpmklfev3fut3eqv3kje54l3to3xzxxbgpt5wjm",
+          "title": "",
+          "width": 700,
+          "height": 701
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/QmQr3Fz4h1etNsF7oLGMRHiCzhB5y9a7GjyodnF7zLHK1g",
+          "title": "",
+          "width": 868,
+          "height": 245
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R/logo.png",
+          "title": "",
+          "width": 653,
+          "height": 653
+        },
+        {
+          "alt": "",
+          "src": "https://static.jup.ag/jlp/icon.png",
+          "title": "",
+          "width": 64,
+          "height": 64
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg",
+          "title": "",
+          "width": 868,
+          "height": 868
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/maple-labs/maple-metadata/refs/heads/main/assets/syrupUSDC.svg",
+          "title": "",
+          "width": 518,
+          "height": 518
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/QmZ7L8yd5j36oXXydUiYFiFsRHbi3EdgC4RuFwvM7dcqge",
+          "title": "",
+          "width": 640,
+          "height": 640
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh/logo.png",
+          "title": "",
+          "width": 120,
+          "height": 120
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/QmZ7L8yd5j36oXXydUiYFiFsRHbi3EdgC4RuFwvM7dcqge",
+          "title": "",
+          "width": 640,
+          "height": 640
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png",
+          "title": "",
+          "width": 181,
+          "height": 181
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB/logo.svg",
+          "title": "",
+          "width": 868,
+          "height": 868
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/bafkreibyb3hcn7gglvdqpmklfev3fut3eqv3kje54l3to3xzxxbgpt5wjm",
+          "title": "",
+          "width": 700,
+          "height": 701
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        },
+        {
+          "alt": "",
+          "src": "https://ipfs.io/ipfs/QmQr3Fz4h1etNsF7oLGMRHiCzhB5y9a7GjyodnF7zLHK1g",
+          "title": "",
+          "width": 868,
+          "height": 245
+        },
+        {
+          "alt": "",
+          "src": "https://assets.coingecko.com/coins/images/21629/large/solana.jpg?1639626543",
+          "title": "",
+          "width": 250,
+          "height": 250
+        }
+      ],
+      "tables": [
+        {
+          "rows": [
+            [
+              "WBTC / SOL\n0.05%",
+              "$41,237.80",
+              "$58.10",
+              "26.584%",
+              "470.12\n636.11\n-18.17%\n+10.73%",
+              "574.48 SOL per WBTC",
+              ""
+            ],
+            [
+              "cbBTC / SOL\n0.16%",
+              "$24,310.10",
+              "$38.45",
+              "28.453%",
+              "470.12\n635.1\n-18.22%\n+10.47%",
+              "574.88 SOL per cbBTC",
+              ""
+            ],
+            [
+              "SOL / USDC\n0.04%",
+              "$23,477.54",
+              "$76.76",
+              "55.589%",
+              "176.31\n238.47\n-11.32%\n+19.95%",
+              "198.8 USDC per SOL",
+              ""
+            ],
+            [
+              "SOL / USDT\n0.02%",
+              "$20,777.02",
+              "$66.13",
+              "50.798%",
+              "175.33\n237.18\n-11.82%\n+19.29%",
+              "198.82 USDT per SOL",
+              ""
+            ],
+            [
+              "PUMP / SOL\n0.16%",
+              "$428.43",
+              "$4.67",
+              "186.836%",
+              "0.0419\n0.0431\n-21.56%\n+30.68%",
+              "0.0424 SOL per PUMP",
+              ""
+            ],
+            [
+              "Fartcoin / SOL\n0.16%",
+              "$210.44",
+              "$0.75",
+              "60.545%",
+              "0.0014\n0.0043\n-29.47%\n+111.37%",
+              "0.002 SOL per Fartcoin",
+              ""
+            ]
+          ],
+          "headers": [
+            "Pool",
+            "Balance",
+            "Pending Yield",
+            "Est. Yield\n365D",
+            "Position Range",
+            "Current Price",
+            ""
+          ],
+          "summary": ""
+        }
+      ],
+      "clmPositions": {
+        "summary": {
+          "totalValue": "110441.33",
+          "pendingYield": "244.86"
+        },
+        "positions": [
+          {
+            "apy": 26.584,
+            "pair": "WBTC/SOL0",
+            "token0": "WBTC",
+            "token1": "SOL0",
+            "balance": 41237.8,
+            "feeTier": "0.05",
+            "inRange": true,
+            "rangeMax": 636.11,
+            "rangeMin": 470.12,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 574.48,
+            "pendingYield": 58.1,
+            "rangeMaxPercent": "+10.73%",
+            "rangeMinPercent": "-18.17%",
+            "balanceFormatted": "41,237.80",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "574.48 SOL per WBTC",
+            "pendingYieldFormatted": "58.10"
+          },
+          {
+            "apy": 28.453,
+            "pair": "cbBTC/SOL0",
+            "token0": "cbBTC",
+            "token1": "SOL0",
+            "balance": 24310.1,
+            "feeTier": "0.16",
+            "inRange": true,
+            "rangeMax": 635.1,
+            "rangeMin": 470.12,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 574.88,
+            "pendingYield": 38.45,
+            "rangeMaxPercent": "+10.47%",
+            "rangeMinPercent": "-18.22%",
+            "balanceFormatted": "24,310.10",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "574.88 SOL per cbBTC",
+            "pendingYieldFormatted": "38.45"
+          },
+          {
+            "apy": 55.589,
+            "pair": "SOL/USDC0",
+            "token0": "SOL",
+            "token1": "USDC0",
+            "balance": 23477.54,
+            "feeTier": "0.04",
+            "inRange": true,
+            "rangeMax": 238.47,
+            "rangeMin": 176.31,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 198.8,
+            "pendingYield": 76.76,
+            "rangeMaxPercent": "+19.95%",
+            "rangeMinPercent": "-11.32%",
+            "balanceFormatted": "23,477.54",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "198.8 USDC per SOL",
+            "pendingYieldFormatted": "76.76"
+          },
+          {
+            "apy": 50.798,
+            "pair": "SOL/USDT0",
+            "token0": "SOL",
+            "token1": "USDT0",
+            "balance": 20777.02,
+            "feeTier": "0.02",
+            "inRange": true,
+            "rangeMax": 237.18,
+            "rangeMin": 175.33,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 198.82,
+            "pendingYield": 66.13,
+            "rangeMaxPercent": "+19.29%",
+            "rangeMinPercent": "-11.82%",
+            "balanceFormatted": "20,777.02",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "198.82 USDT per SOL",
+            "pendingYieldFormatted": "66.13"
+          },
+          {
+            "apy": 186.836,
+            "pair": "PUMP/SOL0",
+            "token0": "PUMP",
+            "token1": "SOL0",
+            "balance": 428.43,
+            "feeTier": "0.16",
+            "inRange": true,
+            "rangeMax": 0.0431,
+            "rangeMin": 0.0419,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 0.0424,
+            "pendingYield": 4.67,
+            "rangeMaxPercent": "+30.68%",
+            "rangeMinPercent": "-21.56%",
+            "balanceFormatted": "428.43",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "0.0424 SOL per PUMP",
+            "pendingYieldFormatted": "4.67"
+          },
+          {
+            "apy": 60.545,
+            "pair": "Fartcoin/SOL0",
+            "token0": "Fartcoin",
+            "token1": "SOL0",
+            "balance": 210.44,
+            "feeTier": "0.16",
+            "inRange": true,
+            "rangeMax": 0.0043,
+            "rangeMin": 0.0014,
+            "capturedAt": "2025-10-27T23:53:24.829Z",
+            "rangeStatus": "in-range",
+            "currentPrice": 0.002,
+            "pendingYield": 0.75,
+            "rangeMaxPercent": "+111.37%",
+            "rangeMinPercent": "-29.47%",
+            "balanceFormatted": "210.44",
+            "distanceFromRange": "0%",
+            "currentPriceFormatted": "0.002 SOL per Fartcoin",
+            "pendingYieldFormatted": "0.75"
+          }
+        ],
+        "inRangeCount": 6,
+        "positionCount": 6,
+        "outOfRangeCount": 0
+      },
+      "textHierarchy": {
+        "lists": [
+          {
+            "type": "ol",
+            "items": [],
+            "itemCount": 0
+          }
+        ],
+        "emphasis": [],
+        "sections": [],
+        "mainContent": "Trade\nPools\nPortfolio\nStake\nWavebreak\nMore\nFast\nDKGQ...zA3k\n5\nPortfolio\nTotal Value\n$110,441.33\nEstimated Yield (365D)\n$42,412.70\n38.403%\nPending Yield\n$244.86\nHarvest Yield\nSOL\nSolana\nSo11...1112\n0.1079\n$21.44\nPUMP\nPump\npump...9Dfn\n1,930\n$9.20\nFartcoin\nFartcoin\n9BB6...pump\n7.2408\n$2.91\nRAY\nRaydium\n4k3D...kX6R\n0.052\n<$0.01\nJLP\nJupiter Perps LP\n27G8...idD4\n0\n-\nUSDT\nTether\nEs9v...wNYB\n0\n-\nsyrupUSDC\nSyrup USDC\nAvZZ...ZeUj\n0\n-\ncbBTC\nCoinbase Wrapped BTC\ncbbt...iMij\n0\n-\n365D\nPool\n\t\nBalance\n\t\nPending Yield\n\t\nEst. Yield\n365D\n\t\nPosition Range\n\t\nCurrent Price\n\t\n\nWBTC / SOL\n0.05%\n\t\n$41,237.80\n\t$58.10\t26.584%\t\n470.12\n636.11\n-18.17%\n+10.73%\n\t574.48 SOL per WBTC\t\n\n\ncbBTC / SOL\n0.16%\n\t\n$24,310.10\n\t$38.45\t28.453%\t\n470.12\n635.1\n-18.22%\n+10.47%\n\t574.88 SOL per cbBTC\t\n\n\nSOL / USDC\n0.04%\n\t\n$23,477.54\n\t$76.76\t55.589%\t\n176.31\n238.47\n-11.32%\n+19.95%\n\t198.8 USDC per SOL\t\n\n\nSOL / USDT\n0.02%\n\t\n$20,777.02\n\t$66.13\t50.798%\t\n175.33\n237.18\n-11.82%\n+19.29%\n\t198.82 USDT per SOL\t\n\n\nPUMP / SOL\n0.16%\n\t\n$428.43\n\t$4.67\t18"
+      },
+      "dataAttributes": [
+        {
+          "id": "",
+          "tag": "div",
+          "text": "SOL\nSolana\nSo11...1112\n0.1079\n$21.44\nPUMP\nPump\npump...9Dfn\n1,930\n$9.20\nFartcoin\nFartcoin\n9BB6...pump",
+          "classes": [
+            "text-primary",
+            "[&_[cmdk-group-heading]]:px-2",
+            "[&_[cmdk-group-heading]]:py-1.5",
+            "[&_[cmdk-group-heading]]:text-xs",
+            "[&_[cmdk-group-heading]]:font-medium",
+            "[&_[cmdk-group-heading]]:text-secondary"
+          ],
+          "dataAttributes": {
+            "data-value": "undefined",
+            "data-sentry-element": "CommandGroup",
+            "data-sentry-source-file": "Tokens.tsx"
+          }
+        },
+        {
+          "id": "radix-:r18:",
+          "tag": "div",
+          "text": "SOL\nSolana\nSo11...1112\n0.1079\n$21.44",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "So11111111111111111111111111111111111111112",
+            "data-disabled": "false",
+            "data-selected": "true"
+          }
+        },
+        {
+          "id": "radix-:r1g:",
+          "tag": "div",
+          "text": "PUMP\nPump\npump...9Dfn\n1,930\n$9.20",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1h:",
+          "tag": "div",
+          "text": "Fartcoin\nFartcoin\n9BB6...pump\n7.2408\n$2.91",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1i:",
+          "tag": "div",
+          "text": "RAY\nRaydium\n4k3D...kX6R\n0.052\n<$0.01",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1j:",
+          "tag": "div",
+          "text": "JLP\nJupiter Perps LP\n27G8...idD4\n0\n-",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1k:",
+          "tag": "div",
+          "text": "USDT\nTether\nEs9v...wNYB\n0\n-",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1l:",
+          "tag": "div",
+          "text": "syrupUSDC\nSyrup USDC\nAvZZ...ZeUj\n0\n-",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "AvZZF1YaZDziPY2RCK4oJrRVrbN3mTD9NL24hPeaZeUj",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        },
+        {
+          "id": "radix-:r1m:",
+          "tag": "div",
+          "text": "cbBTC\nCoinbase Wrapped BTC\ncbbt...iMij\n0\n-",
+          "classes": [
+            "flex",
+            "select-none",
+            "items-center",
+            "rounded-sm",
+            "py-1.5",
+            "text-sm",
+            "outline-none",
+            "aria-selected:bg-neutral-transparent-hover",
+            "transition",
+            "duration-200",
+            "cursor-pointer",
+            "px-6",
+            "gap-x-3",
+            "h-[4.25rem]",
+            "w-full"
+          ],
+          "dataAttributes": {
+            "data-value": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+            "data-disabled": "false",
+            "data-selected": "false"
+          }
+        }
+      ],
+      "dynamicContent": {
+        "ajaxElements": [],
+        "lazyLoadedImages": [],
+        "infiniteScrollElements": []
+      }
+    },
+    "protocol": "Orca",
+    "viewport": {
+      "width": 1342,
+      "height": 844,
+      "scrollX": 0,
+      "scrollY": 0
+    },
+    "timestamp": "2025-10-27T23:53:24.820Z",
+    "performance": {
+      "loadTime": 1221,
+      "firstPaint": 231,
+      "domContentLoaded": 796
+    }
+  },
+  "user_id": null,
+  "created_at": "2025-10-27T23:53:25.154174+00:00"
+}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Dashboard Token Display</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+    .test { margin: 20px 0; padding: 15px; background: #2a2a2a; border-radius: 5px; }
+    .pass { border-left: 4px solid #10b981; }
+    .fail { border-left: 4px solid #ef4444; }
+    h2 { color: #3b82f6; }
+    pre { background: #0a0a0a; padding: 10px; border-radius: 3px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Dashboard Token Data Display Test</h1>
+  <p>This test verifies that the dashboard correctly displays token data and timestamps.</p>
+
+  <div id="results"></div>
+
+  <script>
+    // Copy formatTimeAgo function from dashboard.js
+    function formatTimeAgo(timestamp) {
+      if (!timestamp) return 'Unknown';
+
+      const now = new Date();
+      const capturedAt = new Date(timestamp);
+      const diffMs = now - capturedAt;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHour = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHour / 24);
+
+      if (diffSec < 60) return 'Just now';
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffDay < 7) return `${diffDay}d ago`;
+      if (diffDay < 30) return `${Math.floor(diffDay / 7)}w ago`;
+      return `${Math.floor(diffDay / 30)}mo ago`;
+    }
+
+    // Copy formatTokenAmount function from dashboard.js
+    function formatTokenAmount(amount) {
+      if (!amount || amount === 0) return '0';
+      const n = parseFloat(amount);
+      if (isNaN(n)) return '0';
+
+      if (n < 0.01) {
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+      }
+      if (n < 1) {
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 });
+      }
+      if (n < 1000) {
+        return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+      }
+      return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Test cases
+    const tests = [
+      {
+        name: 'Test 1: Token amounts display correctly',
+        input: {
+          token0Amount: 0.03480719,
+          token1Amount: 6443.29283
+        },
+        expected: {
+          token0Display: '0.03480719',
+          token1Display: '6,443.29'
+        }
+      },
+      {
+        name: 'Test 2: Timestamp "Just now" works',
+        input: {
+          capturedAt: new Date().toISOString()
+        },
+        expected: {
+          timeAgo: 'Just now'
+        }
+      },
+      {
+        name: 'Test 3: Timestamp "2h ago" works',
+        input: {
+          capturedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+        },
+        expected: {
+          timeAgo: '2h ago'
+        }
+      },
+      {
+        name: 'Test 4: Complete position data',
+        input: {
+          pair: 'cbBTC/USDC',
+          protocol: 'Orca',
+          balance: 10135,
+          token0Amount: 0.03480719,
+          token1Amount: 6443.29283,
+          token0Value: 3691,
+          token1Value: 6444,
+          capturedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString()
+        },
+        expected: {
+          hasAllFields: true,
+          token0Percentage: 36.4,
+          token1Percentage: 63.6,
+          timeAgo: '5m ago'
+        }
+      },
+      {
+        name: 'Test 5: NULL token data (current state)',
+        input: {
+          pair: 'SOL/USDC',
+          protocol: 'Orca',
+          balance: 15000,
+          token0Amount: null,
+          token1Amount: null,
+          token0Value: null,
+          token1Value: null,
+          capturedAt: new Date().toISOString()
+        },
+        expected: {
+          willShowZeros: true,
+          token0Display: '0',
+          token1Display: '0'
+        }
+      }
+    ];
+
+    // Run tests
+    const resultsDiv = document.getElementById('results');
+    let passCount = 0;
+    let failCount = 0;
+
+    tests.forEach((test, i) => {
+      const div = document.createElement('div');
+      div.className = 'test';
+
+      let passed = true;
+      let output = `<h2>${test.name}</h2>`;
+
+      if (test.input.token0Amount !== undefined) {
+        const result = formatTokenAmount(test.input.token0Amount);
+        const expected = test.expected.token0Display;
+        if (expected && result !== expected) {
+          passed = false;
+          output += `<p>❌ Token0 display: Expected "${expected}", got "${result}"</p>`;
+        } else {
+          output += `<p>✅ Token0 display: ${result}</p>`;
+        }
+      }
+
+      if (test.input.token1Amount !== undefined) {
+        const result = formatTokenAmount(test.input.token1Amount);
+        const expected = test.expected.token1Display;
+        if (expected && result !== expected) {
+          passed = false;
+          output += `<p>❌ Token1 display: Expected "${expected}", got "${result}"</p>`;
+        } else {
+          output += `<p>✅ Token1 display: ${result}</p>`;
+        }
+      }
+
+      if (test.input.capturedAt) {
+        const result = formatTimeAgo(test.input.capturedAt);
+        const expected = test.expected.timeAgo;
+        if (expected && result !== expected) {
+          passed = false;
+          output += `<p>❌ Timestamp: Expected "${expected}", got "${result}"</p>`;
+        } else {
+          output += `<p>✅ Timestamp: ${result}</p>`;
+        }
+      }
+
+      if (test.expected.hasAllFields) {
+        const balance = test.input.balance;
+        const token0Value = test.input.token0Value;
+        const token1Value = test.input.token1Value;
+        const token0Pct = (token0Value / balance) * 100;
+        const token1Pct = (token1Value / balance) * 100;
+
+        output += `<p>✅ Token0 percentage: ${token0Pct.toFixed(1)}%</p>`;
+        output += `<p>✅ Token1 percentage: ${token1Pct.toFixed(1)}%</p>`;
+      }
+
+      if (test.expected.willShowZeros) {
+        output += `<p>⚠️ This is the CURRENT STATE - positions have NULL data</p>`;
+        output += `<p>💡 Once AI Vision runs, token amounts will populate</p>`;
+      }
+
+      output += `<pre>${JSON.stringify(test.input, null, 2)}</pre>`;
+
+      if (passed) {
+        div.classList.add('pass');
+        passCount++;
+      } else {
+        div.classList.add('fail');
+        failCount++;
+      }
+
+      div.innerHTML = output;
+      resultsDiv.appendChild(div);
+    });
+
+    // Summary
+    const summary = document.createElement('div');
+    summary.className = 'test';
+    summary.innerHTML = `
+      <h2>📊 Test Summary</h2>
+      <p>✅ Passed: ${passCount}</p>
+      <p>❌ Failed: ${failCount}</p>
+      <p><strong>Conclusion:</strong> ${
+        failCount === 0
+          ? 'Dashboard display functions work correctly. Issue is token data NOT being extracted from screenshots.'
+          : 'There are issues with the display functions that need fixing.'
+      }</p>
+    `;
+    resultsDiv.appendChild(summary);
+  </script>
+</body>
+</html>

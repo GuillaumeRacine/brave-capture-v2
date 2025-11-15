@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Orca Portfolio Test</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background: #667eea; color: white; }
+    .summary { background: #f0f0f0; padding: 20px; margin: 20px 0; }
+    button { padding: 10px 20px; background: #667eea; color: white; border: none; cursor: pointer; }
+    #output { background: #f9f9f9; padding: 15px; margin: 20px 0; white-space: pre-wrap; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Orca Portfolio Test Page</h1>
+  <p>This mimics the structure of Orca's portfolio page</p>
+
+  <div class="summary">
+    <div>Total Value</div>
+    <div>$110,567.12</div>
+    <div>Estimated Yield (365D)</div>
+    <div>$42,865.54</div>
+    <div>38.769%</div>
+    <div>Pending Yield</div>
+    <div>$240.69</div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Pool</th>
+        <th>Balance</th>
+        <th>Pending Yield</th>
+        <th>Est. Yield 365D</th>
+        <th>Position Range</th>
+        <th>Current Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>WBTC / SOL<br>0.05%</td>
+        <td>$41,297.03</td>
+        <td>$57.23</td>
+        <td>27.113%</td>
+        <td>470.12 636.11<br>-18.24% +10.62%</td>
+        <td>575.02 SOL per WBTC</td>
+      </tr>
+      <tr>
+        <td>cbBTC / SOL<br>0.16%</td>
+        <td>$24,345.88</td>
+        <td>$37.99</td>
+        <td>28.704%</td>
+        <td>470.12 635.1<br>-18.32% +10.35%</td>
+        <td>575.54 SOL per cbBTC</td>
+      </tr>
+      <tr>
+        <td>SOL / USDC<br>0.04%</td>
+        <td>$23,493.29</td>
+        <td>$75.24</td>
+        <td>55.678%</td>
+        <td>176.31 238.47<br>-11.42% +19.81%</td>
+        <td>199.04 USDC per SOL</td>
+      </tr>
+      <tr>
+        <td>SOL / USDT<br>0.02%</td>
+        <td>$20,787.61</td>
+        <td>$64.87</td>
+        <td>51.818%</td>
+        <td>175.33 237.18<br>-11.90% +19.18%</td>
+        <td>199.01 USDT per SOL</td>
+      </tr>
+      <tr>
+        <td>PUMP / SOL<br>0.16%</td>
+        <td>$431.30</td>
+        <td>$4.62</td>
+        <td>163.842%</td>
+        <td>0.0419 0.0431<br>-22.43% +29.23%</td>
+        <td>0.0424 SOL per PUMP</td>
+      </tr>
+      <tr>
+        <td>Fartcoin / SOL<br>0.16%</td>
+        <td>$212.00</td>
+        <td>$0.74</td>
+        <td>57.139%</td>
+        <td>0.0014 0.0043<br>-30.17% +109.26%</td>
+        <td>0.002 SOL per Fartcoin</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button onclick="testParser()">Test Parser</button>
+  <div id="output"></div>
+
+  <script>
+    // Inline the parser function for testing
+    function captureOrcaCLMPositions() {
+      console.log('🐋 Parsing Orca positions...');
+      const positions = [];
+      const portfolioSummary = {};
+
+      // Total Value
+      const totalValueHeading = Array.from(document.querySelectorAll('*')).find(el =>
+        el.textContent.trim() === 'Total Value'
+      );
+      if (totalValueHeading) {
+        let parent = totalValueHeading.parentElement;
+        for (let i = 0; i < 3; i++) {
+          const match = parent?.textContent.match(/\$([0-9,]+\.[0-9]{2})/);
+          if (match) {
+            portfolioSummary.totalValue = match[1].replace(/,/g, '');
+            console.log('Found Total Value:', match[1]);
+            break;
+          }
+          parent = parent?.parentElement;
+        }
+      }
+
+      // Estimated Yield
+      const yieldHeading = Array.from(document.querySelectorAll('*')).find(el =>
+        el.textContent.includes('Estimated Yield') && el.textContent.includes('365D')
+      );
+      if (yieldHeading) {
+        let parent = yieldHeading.parentElement;
+        for (let i = 0; i < 3; i++) {
+          const text = parent?.textContent || '';
+          const amountMatch = text.match(/\$([0-9,]+\.[0-9]{2})/);
+          const percentMatch = text.match(/([0-9]+\.[0-9]+)%/);
+          if (amountMatch) {
+            portfolioSummary.estimatedYieldAmount = amountMatch[1].replace(/,/g, '');
+            console.log('Found Estimated Yield Amount:', amountMatch[1]);
+          }
+          if (percentMatch) {
+            portfolioSummary.estimatedYieldPercent = percentMatch[1];
+            console.log('Found Estimated Yield Percent:', percentMatch[1] + '%');
+          }
+          if (amountMatch && percentMatch) break;
+          parent = parent?.parentElement;
+        }
+      }
+
+      // Pending Yield
+      const pendingHeading = Array.from(document.querySelectorAll('*')).find(el =>
+        el.textContent.trim() === 'Pending Yield'
+      );
+      if (pendingHeading) {
+        let parent = pendingHeading.parentElement;
+        for (let i = 0; i < 3; i++) {
+          const match = parent?.textContent.match(/\$([0-9,]+\.[0-9]{2})/);
+          if (match) {
+            portfolioSummary.pendingYield = match[1].replace(/,/g, '');
+            console.log('Found Pending Yield:', match[1]);
+            break;
+          }
+          parent = parent?.parentElement;
+        }
+      }
+
+      // Find table rows
+      const rows = document.querySelectorAll('table tbody tr');
+      console.log(`Found ${rows.length} potential position rows`);
+
+      rows.forEach((row, rowIndex) => {
+        try {
+          const cells = row.querySelectorAll('td');
+          console.log(`Row ${rowIndex}: ${cells.length} cells`);
+
+          if (cells.length < 6) {
+            return;
+          }
+
+          const position = {};
+
+          // Pool name and fee tier
+          const poolText = cells[0]?.textContent?.trim();
+          if (poolText && poolText.includes('/')) {
+            const poolMatch = poolText.match(/([A-Za-z0-9]+)\s*\/\s*([A-Za-z0-9]+)/);
+            const feeMatch = poolText.match(/([0-9.]+)%/);
+            if (poolMatch) {
+              position.token0 = poolMatch[1];
+              position.token1 = poolMatch[2];
+              position.pair = `${poolMatch[1]}/${poolMatch[2]}`;
+            }
+            if (feeMatch) {
+              position.feeTier = feeMatch[1];
+            }
+          }
+
+          // Balance
+          const balanceText = cells[1]?.textContent?.trim();
+          const balanceMatch = balanceText?.match(/\$([0-9,]+\.[0-9]{2})/);
+          if (balanceMatch) {
+            position.balance = parseFloat(balanceMatch[1].replace(/,/g, ''));
+          }
+
+          // Pending Yield
+          const pendingYieldText = cells[2]?.textContent?.trim();
+          const pendingYieldMatch = pendingYieldText?.match(/\$([0-9,]+\.[0-9]{2})/);
+          if (pendingYieldMatch) {
+            position.pendingYield = parseFloat(pendingYieldMatch[1].replace(/,/g, ''));
+          }
+
+          // APY
+          const apyText = cells[3]?.textContent?.trim();
+          const apyMatch = apyText?.match(/([0-9.]+)%/);
+          if (apyMatch) {
+            position.apy = parseFloat(apyMatch[1]);
+          }
+
+          // Range
+          const rangeCell = cells[4];
+          const rangeText = rangeCell?.innerText || rangeCell?.textContent || '';
+          const lines = rangeText.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean);
+
+          const rangeNumbers = [];
+          const percentages = [];
+
+          for (const line of lines) {
+            if (line.includes('%')) {
+              const pcts = line.match(/([+-]?[0-9.]+%)/g);
+              if (pcts) percentages.push(...pcts);
+            } else {
+              const nums = line.match(/([0-9]+\.?[0-9]+)/g);
+              if (nums) {
+                nums.forEach(n => rangeNumbers.push(parseFloat(n)));
+              }
+            }
+          }
+
+          const uniqueRangeNumbers = [...new Set(rangeNumbers)];
+          if (uniqueRangeNumbers.length >= 2) {
+            position.rangeMin = uniqueRangeNumbers[0];
+            position.rangeMax = uniqueRangeNumbers[1];
+          }
+
+          const actualPercentages = percentages.filter(p => p.includes('%') && p.match(/^[+-]?\d/));
+          if (actualPercentages.length >= 2) {
+            position.rangeMinPercent = actualPercentages[0];
+            position.rangeMaxPercent = actualPercentages[1];
+          }
+
+          // Current Price
+          const priceText = cells[5]?.textContent?.trim();
+          if (priceText) {
+            const priceMatch = priceText.match(/([0-9.]+)/);
+            if (priceMatch) {
+              position.currentPrice = parseFloat(priceMatch[1]);
+            }
+          }
+
+          // Calculate in range
+          if (position.rangeMin && position.rangeMax && position.currentPrice) {
+            position.inRange = position.currentPrice >= position.rangeMin &&
+                              position.currentPrice <= position.rangeMax;
+          }
+
+          // Add if valid
+          if (position.pair && position.balance) {
+            console.log(`✅ Parsed position: ${position.pair} - $${position.balance}`);
+            positions.push(position);
+          } else {
+            console.log(`⚠️ Skipped row ${rowIndex}: missing pair or balance`);
+          }
+        } catch (error) {
+          console.error(`❌ Error parsing row ${rowIndex}:`, error);
+        }
+      });
+
+      console.log(`🎯 Final result: ${positions.length} positions captured`);
+      console.log('Summary:', portfolioSummary);
+
+      return {
+        summary: portfolioSummary,
+        positions: positions,
+        positionCount: positions.length,
+        inRangeCount: positions.filter(p => p.inRange).length,
+        outOfRangeCount: positions.filter(p => !p.inRange).length
+      };
+    }
+
+    function testParser() {
+      const result = captureOrcaCLMPositions();
+      document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+    }
+  </script>
+</body>
+</html>

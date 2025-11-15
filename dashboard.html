@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-primary: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --bg-dark: #0f172a;
+      --bg-darker: #020617;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --border: #334155;
+      --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      --card-shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-darker);
+      color: var(--text-primary);
+      padding: 8px;
+      min-height: 100vh;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-card);
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .header-content h1 {
+      color: var(--text-primary);
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.75rem;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--success);
+    }
+
+    .btn-secondary:hover {
+      background: #059669;
+    }
+
+    /* Unified Portfolio Summary */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .summary-card {
+      background: var(--bg-card);
+      padding: 10px 12px;
+      border-radius: 6px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.15s;
+      border: 1px solid var(--border);
+    }
+
+    .summary-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .summary-label {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      color: var(--text-primary);
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-subtext {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+    }
+
+    /* Collapsible Card Component */
+    .position-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .position-card.expanded {
+      border-color: var(--primary);
+    }
+
+    .card-header {
+      padding: 12px 14px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s;
+      min-height: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-header:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .card-header:active {
+      background: var(--bg-darker);
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .card-icon.clm {
+      background: var(--primary);
+    }
+
+    .card-icon.hedge {
+      background: var(--secondary);
+    }
+
+    .card-icon.collateral {
+      background: var(--success);
+    }
+
+    .card-title-text h2 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-title-text p {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .card-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.15s;
+      min-height: 28px;
+      min-width: 28px;
+      justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-toggle:hover {
+      background: var(--bg-darker);
+      color: var(--primary);
+    }
+
+    .toggle-icon {
+      font-size: 0.875rem;
+      transition: transform 0.2s;
+      display: inline-block;
+    }
+
+    .position-card.expanded .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Summary Metrics (Collapsed View) */
+    .card-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .metric-label {
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-value.positive {
+      color: var(--success);
+    }
+
+    .metric-value.negative {
+      color: var(--danger);
+    }
+
+    .metric-value.warning {
+      color: var(--warning);
+    }
+
+    .metric-subtext {
+      color: var(--text-muted);
+      font-size: 0.625rem;
+    }
+
+    /* Card Content (Expanded View) */
+    .card-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease-out;
+    }
+
+    .position-card.expanded .card-content {
+      max-height: 5000px;
+      transition: max-height 0.3s ease-in;
+    }
+
+    .card-content-inner {
+      padding: 0 14px 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Position List */
+    .position-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    /* Column Headers */
+    .position-header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+
+    .position-header-row .position-header {
+      width: 200px;
+    }
+
+    .position-header-row .position-details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .position-header-row .price-range-container {
+      width: 280px;
+    }
+
+    .header-label {
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .position-item {
+      background: var(--bg-darker);
+      border-radius: 4px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .position-item:hover {
+      border-color: var(--primary);
+      background: var(--bg-card);
+    }
+
+    .position-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 200px;
+      flex-shrink: 0;
+    }
+
+    .position-pair {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .position-protocol {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .position-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.625rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+      width: 20px;
+    }
+
+    .position-badge.in-range {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .position-badge.out-of-range {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .position-badge.critical {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .position-details {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .position-detail {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      min-width: fit-content;
+    }
+
+    /* Fixed widths for table-like alignment */
+    .position-detail.balance {
+      width: 100px;
+      text-align: right;
+    }
+
+    .position-detail.token {
+      width: 240px;
+      min-width: 240px;
+    }
+
+    .position-detail.yield {
+      width: 80px;
+      text-align: right;
+    }
+
+    .position-detail.apy {
+      width: 70px;
+      text-align: right;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      font-weight: 500;
+    }
+
+    .detail-value {
+      color: var(--text-primary);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Price Range Slider - Compact Inline */
+    .price-range-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      width: 280px;
+    }
+
+    .current-price-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      width: 90px;
+    }
+
+    .current-price-value {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.6875rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .price-range-slider {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      flex-shrink: 0;
+      flex: 1;
+    }
+
+    .price-label {
+      font-size: 0.625rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      width: 50px;
+    }
+
+    .price-label:first-child {
+      text-align: right;
+    }
+
+    .slider-track {
+      width: 80px;
+      height: 6px;
+      background: var(--bg-darker);
+      border-radius: 3px;
+      position: relative;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .slider-fill {
+      position: absolute;
+      height: 100%;
+      background: linear-gradient(90deg, var(--success) 0%, var(--warning) 50%, var(--danger) 100%);
+      border-radius: 3px;
+      opacity: 0.3;
+    }
+
+    .slider-tick {
+      position: absolute;
+      width: 2px;
+      height: 10px;
+      background: var(--text-primary);
+      border-radius: 1px;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .slider-tick::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--text-primary);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 1px var(--bg-card);
+    }
+
+    .slider-tick.out-of-range::after {
+      background: var(--danger);
+    }
+
+    .slider-tick.in-range::after {
+      background: var(--success);
+    }
+
+    /* Loading State */
+    .loading-spinner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      color: var(--text-muted);
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-bottom: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 24px 16px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-subtext {
+      font-size: 0.75rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+      body {
+        padding: 6px;
+      }
+
+      header {
+        padding: 8px 12px;
+      }
+
+      .header-content h1 {
+        font-size: 1rem;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+      }
+
+      .summary-card {
+        padding: 8px 10px;
+      }
+
+      .summary-value {
+        font-size: 1rem;
+      }
+
+      .card-header {
+        padding: 10px 12px;
+      }
+
+      .card-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.875rem;
+      }
+
+      .card-title-text h2 {
+        font-size: 0.8125rem;
+      }
+
+      .card-metrics {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .metric-value {
+        font-size: 0.9375rem;
+      }
+
+      .card-content-inner {
+        padding: 0 12px 10px 12px;
+      }
+
+      .position-item {
+        padding: 8px 10px;
+      }
+
+      .position-details {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .btn {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .position-details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .btn, .card-toggle {
+        display: none;
+      }
+
+      .position-card {
+        page-break-inside: avoid;
+      }
+
+      .card-content {
+        max-height: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-content">
+        <h1>🎯 Portfolio Dashboard</h1>
+        <div class="subtitle">CLM Positions, Hedges & Collateral</div>
+      </div>
+    </header>
+
+    <!-- CLM Positions Card -->
+    <div class="position-card" id="clmCard">
+      <div class="card-header" data-target="clmCard">
+        <div class="card-title-row">
+          <div class="card-title">
+            <div class="card-icon clm">💎</div>
+            <div class="card-title-text">
+              <h2>CLM Positions</h2>
+              <p>Concentrated Liquidity Markets</p>
+            </div>
+          </div>
+          <div class="card-toggle">
+            <span class="toggle-text">Expand</span>
+            <span class="toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="card-metrics">
+          <div class="metric">
+            <div class="metric-label">Total Value</div>
+            <div class="metric-value" id="clmTotalValue">$0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Positions</div>
+            <div class="metric-value" id="clmPositionCount">0</div>
+            <div class="metric-subtext" id="clmInRangeText">0 in range</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Pending Yield</div>
+            <div class="metric-value" id="clmPendingYield">$0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Weighted APY</div>
+            <div class="metric-value" id="clmWeightedAPY">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-content-inner">
+          <div class="position-list" id="clmPositionList">
+            <!-- CLM positions will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hedges Card -->
+    <div class="position-card" id="hedgesCard">
+      <div class="card-header" data-target="hedgesCard">
+        <div class="card-title-row">
+          <div class="card-title">
+            <div class="card-icon hedge">🛡️</div>
+            <div class="card-title-text">
+              <h2>Hedge Positions</h2>
+              <p>Hyperliquid Perpetual Futures</p>
+            </div>
+          </div>
+          <div class="card-toggle">
+            <span class="toggle-text">Expand</span>
+            <span class="toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="card-metrics">
+          <div class="metric">
+            <div class="metric-label">Total Notional</div>
+            <div class="metric-value" id="hedgesTotalValue">$0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Positions</div>
+            <div class="metric-value" id="hedgesPositionCount">0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Total PnL</div>
+            <div class="metric-value" id="hedgesTotalPnL">$0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Avg Leverage</div>
+            <div class="metric-value" id="hedgesAvgLeverage">0x</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-content-inner">
+          <div class="position-list" id="hedgesPositionList">
+            <!-- Hedge positions will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Collateral Card -->
+    <div class="position-card" id="collateralCard">
+      <div class="card-header" data-target="collateralCard">
+        <div class="card-title-row">
+          <div class="card-title">
+            <div class="card-icon collateral">🏦</div>
+            <div class="card-title-text">
+              <h2>Collateral Assets</h2>
+              <p>Aave & Morpho Lending</p>
+            </div>
+          </div>
+          <div class="card-toggle">
+            <span class="toggle-text">Expand</span>
+            <span class="toggle-icon">▼</span>
+          </div>
+        </div>
+        <div class="card-metrics">
+          <div class="metric">
+            <div class="metric-label">Total Collateral</div>
+            <div class="metric-value" id="collateralTotalValue">$0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Positions</div>
+            <div class="metric-value" id="collateralPositionCount">0</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Avg Health</div>
+            <div class="metric-value" id="collateralAvgHealth">-</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Net APY</div>
+            <div class="metric-value" id="collateralNetAPY">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-content-inner">
+          <div class="position-list" id="collateralPositionList">
+            <!-- Collateral positions will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load dependencies -->
+  <!-- Use local Supabase library to satisfy extension CSP (no remote scripts) -->
+  <script src="supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>

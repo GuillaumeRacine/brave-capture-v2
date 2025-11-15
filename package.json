@@ -1,0 +1,23 @@
+{
+  "name": "brave-capture",
+  "version": "1.0.0",
+  "description": "Chrome extension for capturing and tracking CLM positions",
+  "type": "module",
+  "scripts": {
+    "validate": "node scripts/validate-capture.js",
+    "analyze": "node scripts/analyze-capture.js",
+    "build:config": "node build-config.js",
+    "setup:db": "node setup-database.js",
+    "test": "node tests/test-vision-flow.js",
+    "test:db": "node tests/test-db-update.js",
+    "test:integration": "node tests/test-integration.js",
+    "test:all": "npm run test && npm run test:db && npm run test:integration"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.0",
+    "@supabase/supabase-js": "^2.76.1",
+    "claude": "^0.1.1",
+    "codex-monorepo": "github:openai/codex",
+    "dotenv": "^16.4.5"
+  }
+}

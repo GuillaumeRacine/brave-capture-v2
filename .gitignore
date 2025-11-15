@@ -1,0 +1,43 @@
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Generated config files (contain API keys from .env.local)
+config.js
+background-config.js
+
+# Node modules
+node_modules/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+build/
+
+# Temporary files
+*.tmp
+.cache/
+
+# Testing
+coverage/
+
+# Captured data (optional - uncomment if you want to exclude)
+# captures/
+# *.json

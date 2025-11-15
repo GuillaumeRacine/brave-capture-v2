@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Test</title>
+</head>
+<body>
+  <h1>Dashboard Loading Test</h1>
+  <div id="output"></div>
+
+  <script src="supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-client.js"></script>
+
+  <script>
+    const output = document.getElementById('output');
+
+    function log(msg) {
+      console.log(msg);
+      output.innerHTML += `<p>${msg}</p>`;
+    }
+
+    async function test() {
+      log('1. Testing if window.supabase exists: ' + (window.supabase ? '✅' : '❌'));
+      log('2. Testing if window.SUPABASE_CONFIG exists: ' + (window.SUPABASE_CONFIG ? '✅' : '❌'));
+      log('3. Testing if window.getLatestPositions exists: ' + (window.getLatestPositions ? '✅' : '❌'));
+
+      if (window.getLatestPositions) {
+        try {
+          log('4. Calling getLatestPositions()...');
+          const positions = await window.getLatestPositions();
+          log(`5. Got ${positions.length} positions ✅`);
+          log(`6. Positions: ${JSON.stringify(positions, null, 2)}`);
+        } catch (error) {
+          log(`5. Error: ${error.message} ❌`);
+          console.error(error);
+        }
+      }
+    }
+
+    test();
+  </script>
+</body>
+</html>
