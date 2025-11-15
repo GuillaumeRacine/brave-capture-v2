@@ -55,8 +55,8 @@ Track CLM positions across **9 protocols**:
 **Install Extension:**
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/Brave-Capture.git
-   cd Brave-Capture
+   git clone https://github.com/GuillaumeRacine/brave-capture-v2.git
+   cd brave-capture-v2
    ```
 
 2. Install dependencies:

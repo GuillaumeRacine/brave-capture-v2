@@ -1,7 +1,15 @@
 {
-  "name": "brave-capture",
-  "version": "1.0.0",
-  "description": "Chrome extension for capturing and tracking CLM positions",
+  "name": "brave-capture-v2",
+  "version": "1.4.0",
+  "description": "Chrome extension for capturing and tracking CLM positions across 9 DeFi protocols with AI-powered extraction and automated quality control",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuillaumeRacine/brave-capture-v2.git"
+  },
+  "homepage": "https://github.com/GuillaumeRacine/brave-capture-v2#readme",
+  "bugs": {
+    "url": "https://github.com/GuillaumeRacine/brave-capture-v2/issues"
+  },
   "type": "module",
   "scripts": {
     "validate": "node scripts/validate-capture.js",
