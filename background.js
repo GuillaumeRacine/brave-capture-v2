@@ -544,13 +544,17 @@ You have BOTH a screenshot AND text data extracted from the page. Use BOTH sourc
 
 Analyze the screenshot and text to extract ALL positions.
 
-For ${protocol === 'Aave' ? 'Aave supply positions' : 'Morpho borrow positions'}, extract:
+For ${protocol === 'Aave' ? 'Aave positions (both supplies and borrows)' : 'Morpho borrow positions'}, extract:
 ${protocol === 'Aave' ? `
-1. **asset** - Token symbol (e.g., "wstETH", "ETH", "USDC")
-2. **amount** - Amount of tokens supplied
-3. **usdValue** - USD value of the supply
-4. **apy** - Supply APY percentage
-5. **type** - Always "supply"
+IMPORTANT: Aave has BOTH supply positions (collateral) AND borrow positions (loans).
+Extract ALL of them with the correct type.
+
+For each position, extract:
+1. **asset** - Token symbol (e.g., "wstETH", "ETH", "USDC", "USDT")
+2. **amount** - Amount of tokens
+3. **usdValue** - USD value
+4. **apy** - APY percentage (supply APY for supplies, borrow APY for borrows)
+5. **type** - "supply" for collateral, "borrow" for loans
 
 Return ONLY a JSON array (no markdown):
 [
@@ -560,6 +564,13 @@ Return ONLY a JSON array (no markdown):
     "usdValue": "50073.87",
     "apy": "0.02",
     "type": "supply"
+  },
+  {
+    "asset": "USDC",
+    "amount": "25000",
+    "usdValue": "25000",
+    "apy": "6.45",
+    "type": "borrow"
   }
 ]` : `
 1. **collateralAsset** - Collateral token (e.g., "wstETH", "cbBTC")

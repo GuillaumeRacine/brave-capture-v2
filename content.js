@@ -3195,9 +3195,10 @@ function captureAavePositions() {
     }
   });
 
-  // Parse supply positions
+  // Parse supply and borrow positions
   let currentAsset = null;
   let foundSuppliesSection = false;
+  let foundBorrowsSection = false;
 
   allElements.forEach(el => {
     const text = (el.innerText || el.textContent || '').trim();
@@ -3205,11 +3206,23 @@ function captureAavePositions() {
     // Detect "Your supplies" section
     if (text.includes('Your supplies')) {
       foundSuppliesSection = true;
+      foundBorrowsSection = false;
       console.log('Aave: Found supplies section');
     }
 
+    // Detect "Your borrows" section
+    if (text.includes('Your borrows')) {
+      foundBorrowsSection = true;
+      foundSuppliesSection = false;
+      if (currentAsset && currentAsset.asset) {
+        positions.push({...currentAsset});
+        currentAsset = null;
+      }
+      console.log('Aave: Found borrows section');
+    }
+
     // Look for asset symbols (ETH, WBTC, USDC, etc.)
-    if (foundSuppliesSection) {
+    if (foundSuppliesSection || foundBorrowsSection) {
       const assetMatch = text.match(/^(ETH|WBTC|USDC|USDT|DAI|wstETH|cbBTC|WETH)$/);
       if (assetMatch) {
         if (currentAsset && currentAsset.asset) {
@@ -3217,9 +3230,9 @@ function captureAavePositions() {
         }
         currentAsset = {
           asset: assetMatch[1],
-          type: 'supply'
+          type: foundBorrowsSection ? 'borrow' : 'supply'
         };
-        console.log('Aave: Found asset:', currentAsset.asset);
+        console.log('Aave: Found', currentAsset.type, 'asset:', currentAsset.asset);
       }
 
       // Parse balance amount
@@ -3277,11 +3290,23 @@ function captureAavePositions() {
     pos.protocol = 'Aave';
   });
 
-  console.log('Aave: Found', positions.length, 'raw positions,', uniquePositions.length, 'complete unique positions');
+  // Separate supplies and borrows
+  const supplies = uniquePositions.filter(p => p.type === 'supply');
+  const borrows = uniquePositions.filter(p => p.type === 'borrow');
+
+  // Calculate total borrowed
+  const totalBorrowed = borrows.reduce((sum, b) => sum + parseFloat(b.usdValue || 0), 0);
+
+  console.log('Aave: Found', supplies.length, 'supplies,', borrows.length, 'borrows');
 
   return {
-    summary: summary,
-    positions: uniquePositions,
+    summary: {
+      ...summary,
+      totalBorrowed: totalBorrowed.toFixed(2)
+    },
+    positions: uniquePositions,  // Keep all positions (supplies + borrows)
+    supplies: supplies,
+    borrows: borrows,
     positionCount: uniquePositions.length,
     totalValue: summary.suppliesBalance || '0'
   };

@@ -3,6 +3,7 @@
 let clmPositions = [];
 let hedgePositions = [];
 let collateralPositions = [];
+let aaveSummary = null;  // Store Aave global data (health factor, total borrowed, etc.)
 
 // Format timestamp as "X min/hours/days ago"
 function formatTimeAgo(timestamp) {
@@ -258,13 +259,25 @@ async function loadCollateralPositions(captures) {
     console.log('Aave data structure:', aaveData);
     console.log('Aave positions count:', aaveData.positions?.length || 0);
 
-    const aavePositions = (aaveData.positions || []).map(p => ({
-      ...p,
-      protocol: 'Aave',
-      healthFactor: aaveData.summary?.healthFactor || 'N/A'
-    }));
-    collateralPositions.push(...aavePositions);
-    console.log('Added', aavePositions.length, 'Aave positions');
+    // Store Aave summary for metrics
+    aaveSummary = {
+      healthFactor: aaveData.summary?.healthFactor || 'N/A',
+      totalBorrowed: aaveData.summary?.totalBorrowed || '0',
+      netAPY: aaveData.summary?.netAPY || '0',
+      netWorth: aaveData.summary?.netWorth || '0',
+      supplies: aaveData.supplies || [],
+      borrows: aaveData.borrows || []
+    };
+
+    // Only show supply positions in collateral table (Aave is cross-collateralized)
+    const aaveSupplies = (aaveData.positions || [])
+      .filter(p => p.type === 'supply')
+      .map(p => ({
+        ...p,
+        protocol: 'Aave'
+      }));
+    collateralPositions.push(...aaveSupplies);
+    console.log('Added', aaveSupplies.length, 'Aave supply positions (filtered from', aaveData.positions?.length || 0, 'total)');
   }
 
   // Get latest Morpho capture with detailed logging
@@ -579,113 +592,200 @@ function renderHedgePositions() {
 function renderCollateralPositions() {
   const list = document.getElementById('collateralPositionList');
 
-  if (collateralPositions.length === 0) {
+  if (collateralPositions.length === 0 && (!aaveSummary || aaveSummary.borrows.length === 0)) {
     list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">No collateral positions</div><div class="empty-state-subtext">Capture data from Aave or Morpho</div></div>';
     updateCollateralMetrics();
     return;
   }
 
-  // Create header row
-  const headerRow = `
-    <div class="position-header-row">
-      <div class="position-header" style="flex: 0 0 200px;">
-        <span class="header-label">Asset</span>
-      </div>
-      <div class="position-details">
-        <div class="position-detail" style="flex: 0 0 140px;">
-          <span class="header-label">Amount</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 110px;">
-          <span class="header-label">Value</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 90px;">
-          <span class="header-label">Rate</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 130px;">
-          <span class="header-label">Loan</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 80px;">
-          <span class="header-label">LTV</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 90px;">
-          <span class="header-label">Health</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 110px;">
-          <span class="header-label">Liq. Price</span>
-        </div>
-        <div class="position-detail" style="flex: 0 0 80px;">
-          <span class="header-label">Liq. LTV</span>
-        </div>
-      </div>
-    </div>
-  `;
+  let html = '';
 
-  const positionRows = collateralPositions.map(pos => {
-    const healthValue = parseFloat(pos.healthFactor);
-    let healthClass = '';
-    if (!isNaN(healthValue)) {
-      if (healthValue < 1.2) healthClass = 'negative';
-      else if (healthValue < 1.5) healthClass = 'warning';
-      else healthClass = 'positive';
-    }
+  // Separate Aave and Morpho positions
+  const aavePositions = collateralPositions.filter(p => p.protocol === 'Aave');
+  const morphoPositions = collateralPositions.filter(p => p.protocol === 'Morpho');
 
-    // Handle different data structures for Aave vs Morpho
-    const asset = pos.asset || pos.collateralAsset;
-    const amount = pos.amount || pos.collateralAmount;
-    const usdValue = pos.usdValue || pos.collateralValue;
-    const parsedValue = parseFloat(usdValue?.replace(/[k$,]/g, '') || 0) * (usdValue?.includes('k') ? 1000 : 1);
-
-    // Format rate/APY with proper % sign
-    const rate = pos.rate ? `${pos.rate}%` : (pos.apy ? `${pos.apy}%` : '-');
-
-    // Format health factor with color coding
-    const healthDisplay = pos.healthFactor ?
-      `<span class="${healthClass === 'positive' ? 'positive' : healthClass === 'negative' ? 'negative' : 'warning'}">${pos.healthFactor}</span>`
-      : '-';
-
-    // Format liquidation price with proper formatting
-    const liqPrice = pos.liquidationPrice ?
-      (parseFloat(pos.liquidationPrice) > 1000 ?
-        `$${parseFloat(pos.liquidationPrice).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-        : `$${parseFloat(pos.liquidationPrice).toFixed(2)}`)
-      : '-';
-
-    return `
-      <div class="position-item">
-        <div class="position-header" style="flex: 0 0 200px;">
-          <div class="position-pair">${asset} <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· ${pos.protocol}</span></div>
-        </div>
-        <div class="position-details">
-          <div class="position-detail" style="flex: 0 0 140px;">
-            <span class="detail-value">${amount} ${asset}</span>
+  // Render Aave Supplies (simplified columns)
+  if (aavePositions.length > 0) {
+    html += `
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Aave Supplies</div>
+        <div class="position-header-row">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <span class="header-label">Asset</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 110px;">
-            <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 90px;">
-            <span class="detail-value">${rate}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 130px;">
-            <span class="detail-value">${pos.loanAsset ? `${pos.loanAmount} ${pos.loanAsset}` : '-'}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 80px;">
-            <span class="detail-value">${pos.ltv ? pos.ltv + '%' : '-'}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 90px;">
-            <span class="detail-value">${healthDisplay}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 110px;">
-            <span class="detail-value">${liqPrice}</span>
-          </div>
-          <div class="position-detail" style="flex: 0 0 80px;">
-            <span class="detail-value">${pos.liquidationLTV ? pos.liquidationLTV + '%' : '-'}</span>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="header-label">Amount</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="header-label">Value</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 100px;">
+              <span class="header-label">Supply APY</span>
+            </div>
           </div>
         </div>
-      </div>
     `;
-  }).join('');
 
-  list.innerHTML = headerRow + positionRows;
+    aavePositions.forEach(pos => {
+      const parsedValue = parseFloat(pos.usdValue || 0);
+      html += `
+        <div class="position-item">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <div class="position-pair">${pos.asset}</div>
+          </div>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="detail-value">${pos.amount} ${pos.asset}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 100px;">
+              <span class="detail-value">${pos.apy || '0'}%</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+  }
+
+  // Render Aave Borrows (if any)
+  if (aaveSummary && aaveSummary.borrows && aaveSummary.borrows.length > 0) {
+    html += `
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Aave Borrows</div>
+        <div class="position-header-row">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <span class="header-label">Asset</span>
+          </div>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="header-label">Amount</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="header-label">Value</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 100px;">
+              <span class="header-label">Borrow APY</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="header-label">Annual Cost</span>
+            </div>
+          </div>
+        </div>
+    `;
+
+    aaveSummary.borrows.forEach(borrow => {
+      const parsedValue = parseFloat(borrow.usdValue || 0);
+      const annualCost = parsedValue * (parseFloat(borrow.apy || 0) / 100);
+      html += `
+        <div class="position-item">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <div class="position-pair">${borrow.asset}</div>
+          </div>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="detail-value">${borrow.amount} ${borrow.asset}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 100px;">
+              <span class="detail-value negative">${borrow.apy || '0'}%</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 120px;">
+              <span class="detail-value negative">-$${annualCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+  }
+
+  // Render Morpho Positions (full columns)
+  if (morphoPositions.length > 0) {
+    html += `
+      <div style="margin-bottom: 1rem;">
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Morpho Positions</div>
+        <div class="position-header-row">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <span class="header-label">Asset</span>
+          </div>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="header-label">Amount</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 110px;">
+              <span class="header-label">Value</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 90px;">
+              <span class="header-label">Rate</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 130px;">
+              <span class="header-label">Loan</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 80px;">
+              <span class="header-label">LTV</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 110px;">
+              <span class="header-label">Liq. Price</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 80px;">
+              <span class="header-label">Liq. LTV</span>
+            </div>
+          </div>
+        </div>
+    `;
+
+    morphoPositions.forEach(pos => {
+      const parsedValue = parseFloat(pos.collateralValue?.replace(/[k$,]/g, '') || 0) * (pos.collateralValue?.includes('k') ? 1000 : 1);
+      const liqPrice = pos.liquidationPrice ?
+        (parseFloat(pos.liquidationPrice) > 1000 ?
+          `$${parseFloat(pos.liquidationPrice).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+          : `$${parseFloat(pos.liquidationPrice).toFixed(2)}`)
+        : '-';
+
+      html += `
+        <div class="position-item">
+          <div class="position-header" style="flex: 0 0 200px;">
+            <div class="position-pair">${pos.collateralAsset}</div>
+          </div>
+          <div class="position-details">
+            <div class="position-detail" style="flex: 0 0 140px;">
+              <span class="detail-value">${pos.collateralAmount} ${pos.collateralAsset}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 110px;">
+              <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 90px;">
+              <span class="detail-value">${pos.rate || '0'}%</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 130px;">
+              <span class="detail-value">${pos.loanAmount} ${pos.loanAsset}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 80px;">
+              <span class="detail-value">${pos.ltv || '0'}%</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 110px;">
+              <span class="detail-value">${liqPrice}</span>
+            </div>
+            <div class="position-detail" style="flex: 0 0 80px;">
+              <span class="detail-value">${pos.liquidationLTV || '0'}%</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    html += '</div>';
+  }
+
+  list.innerHTML = html;
   updateCollateralMetrics();
 }
 
@@ -738,6 +838,7 @@ function updateHedgeMetrics() {
 
 // Update Collateral Metrics
 function updateCollateralMetrics() {
+  // Calculate total collateral value
   const totalValue = collateralPositions.reduce((sum, p) => {
     let value = 0;
     const usdValue = p.usdValue || p.collateralValue;
@@ -748,31 +849,73 @@ function updateCollateralMetrics() {
     return sum + value;
   }, 0);
 
-  const healthFactors = collateralPositions
-    .map(p => parseFloat(p.healthFactor))
-    .filter(h => !isNaN(h) && h > 0);
-  const avgHealth = healthFactors.length > 0
-    ? (healthFactors.reduce((sum, h) => sum + h, 0) / healthFactors.length)
-    : 0;
+  // Use Aave global health factor if available, otherwise calculate from Morpho positions
+  let healthFactor = '-';
+  if (aaveSummary && aaveSummary.healthFactor && aaveSummary.healthFactor !== 'N/A') {
+    healthFactor = aaveSummary.healthFactor;
+  } else {
+    const healthFactors = collateralPositions
+      .map(p => parseFloat(p.healthFactor))
+      .filter(h => !isNaN(h) && h > 0);
+    if (healthFactors.length > 0) {
+      healthFactor = (healthFactors.reduce((sum, h) => sum + h, 0) / healthFactors.length).toFixed(2);
+    }
+  }
+
+  // Calculate total borrowed (Aave + Morpho)
+  let totalBorrowed = 0;
+  if (aaveSummary && aaveSummary.totalBorrowed) {
+    totalBorrowed += parseFloat(aaveSummary.totalBorrowed);
+  }
+  // Add Morpho borrows
+  totalBorrowed += collateralPositions
+    .filter(p => p.protocol === 'Morpho')
+    .reduce((sum, p) => {
+      let value = 0;
+      const loanValue = p.loanValue;
+      if (loanValue) {
+        value = parseFloat(loanValue.replace(/[k$,]/g, ''));
+        if (loanValue.includes('k')) value *= 1000;
+      }
+      return sum + value;
+    }, 0);
+
+  // Calculate weighted supply APY (only for supply positions)
+  let totalSupplyValue = 0;
+  let weightedAPY = 0;
+
+  // Aave supplies
+  if (aaveSummary && aaveSummary.supplies) {
+    aaveSummary.supplies.forEach(supply => {
+      const value = parseFloat(supply.usdValue || 0);
+      totalSupplyValue += value;
+      weightedAPY += value * (parseFloat(supply.apy || 0));
+    });
+  }
+
+  if (totalSupplyValue > 0) {
+    weightedAPY = (weightedAPY / totalSupplyValue).toFixed(2);
+  } else {
+    weightedAPY = '0.00';
+  }
 
   document.getElementById('collateralTotalValue').textContent = '$' + Math.round(totalValue).toLocaleString('en-US');
-  document.getElementById('collateralPositionCount').textContent = collateralPositions.length;
-  document.getElementById('collateralAvgHealth').textContent = avgHealth > 0 ? avgHealth.toFixed(2) : '-';
+  document.getElementById('collateralPositionCount').textContent = (collateralPositions.length + (aaveSummary?.borrows?.length || 0));
+  document.getElementById('collateralAvgHealth').textContent = healthFactor;
 
   const healthElement = document.getElementById('collateralAvgHealth');
-  if (avgHealth >= 2.0) {
+  const hf = parseFloat(healthFactor);
+  healthElement.classList.remove('positive', 'warning', 'negative');
+  if (hf >= 2.0) {
     healthElement.classList.add('positive');
-  } else if (avgHealth >= 1.5) {
+  } else if (hf >= 1.5) {
     healthElement.classList.add('warning');
-  } else if (avgHealth > 0) {
+  } else if (hf > 0) {
     healthElement.classList.add('negative');
   }
 
-  // Calculate net APY (simplified - just show rate if available)
-  const avgRate = collateralPositions
-    .map(p => parseFloat(p.rate) || 0)
-    .reduce((sum, r) => sum + r, 0) / (collateralPositions.length || 1);
-  document.getElementById('collateralNetAPY').textContent = avgRate.toFixed(1) + '%';
+  // Show total borrowed in the Net APY slot for now (we'll add a dedicated slot later)
+  document.getElementById('collateralNetAPY').textContent = '$' + Math.round(totalBorrowed).toLocaleString('en-US') + ' borrowed · ' + weightedAPY + '% APY';
 }
 
 // Update Unified Summary
