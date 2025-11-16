@@ -740,12 +740,57 @@ Return ONLY a JSON array (no markdown, no explanation):
           const updatedData = { ...currentCapture.data };
           if (!updatedData.content) updatedData.content = {};
 
-          updatedData.content[contentKey] = {
+          // For Morpho: merge AI extraction with content.js parser data
+          // Content.js has better LTV, liquidation data - use AI only to fill gaps
+          if (protocol === 'Morpho' && updatedData.content[contentKey]?.positions) {
+            const parserPositions = updatedData.content[contentKey].positions;
+            console.log('🔄 Merging Morpho AI extraction with parser data...');
+
+            // Merge: use parser data as base, fill gaps with AI data
+            extractedPositions = extractedPositions.map((aiPos, index) => {
+              const parserPos = parserPositions[index] || {};
+              return {
+                ...aiPos,
+                // Prefer parser data for these fields (AI often misses them)
+                ltv: parserPos.ltv || aiPos.ltv,
+                liquidationLTV: parserPos.liquidationLTV || aiPos.liquidationLTV,
+                liquidationPrice: parserPos.liquidationPrice || aiPos.liquidationPrice,
+                utilization: parserPos.utilization || aiPos.utilization,
+                dropToLiquidation: parserPos.dropToLiquidation,
+                liquidationPricePair: parserPos.liquidationPricePair
+              };
+            });
+            console.log('✅ Merged Morpho data:', extractedPositions);
+          }
+
+          // For Aave: separate supplies and borrows
+          let aaveData = {
             positions: extractedPositions,
             positionCount: extractedPositions.length,
             totalValue: protocol === 'Aave' ?
               extractedPositions.reduce((sum, p) => sum + parseFloat(p.usdValue || 0), 0).toFixed(2) :
               (extractedPositions[0]?.collateralValue || '0')
+          };
+
+          if (protocol === 'Aave') {
+            const supplies = extractedPositions.filter(p => p.type === 'supply');
+            const borrows = extractedPositions.filter(p => p.type === 'borrow');
+            const totalBorrowed = borrows.reduce((sum, b) => sum + parseFloat(b.usdValue || 0), 0);
+
+            aaveData.supplies = supplies;
+            aaveData.borrows = borrows;
+            aaveData.summary = {
+              ...(updatedData.content[contentKey]?.summary || {}),
+              totalBorrowed: totalBorrowed.toFixed(2)
+            };
+
+            console.log(`✅ Aave: ${supplies.length} supplies, ${borrows.length} borrows, $${totalBorrowed.toFixed(2)} total borrowed`);
+          }
+
+          updatedData.content[contentKey] = protocol === 'Aave' ? aaveData : {
+            positions: extractedPositions,
+            positionCount: extractedPositions.length,
+            totalValue: (extractedPositions[0]?.collateralValue || '0')
           };
 
           const { error } = await supabase
