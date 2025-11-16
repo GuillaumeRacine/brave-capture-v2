@@ -595,23 +595,26 @@ function renderCollateralPositions() {
         <div class="position-detail" style="flex: 0 0 140px;">
           <span class="header-label">Amount</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 120px;">
+        <div class="position-detail" style="flex: 0 0 110px;">
           <span class="header-label">Value</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 100px;">
-          <span class="header-label">APY/Rate</span>
+        <div class="position-detail" style="flex: 0 0 90px;">
+          <span class="header-label">Rate</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 140px;">
+        <div class="position-detail" style="flex: 0 0 130px;">
           <span class="header-label">Loan</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 100px;">
+        <div class="position-detail" style="flex: 0 0 80px;">
           <span class="header-label">LTV</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 120px;">
+        <div class="position-detail" style="flex: 0 0 90px;">
+          <span class="header-label">Health</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 110px;">
           <span class="header-label">Liq. Price</span>
         </div>
-        <div class="position-detail" style="flex: 0 0 100px;">
-          <span class="header-label">Util.</span>
+        <div class="position-detail" style="flex: 0 0 80px;">
+          <span class="header-label">Liq. LTV</span>
         </div>
       </div>
     </div>
@@ -632,33 +635,50 @@ function renderCollateralPositions() {
     const usdValue = pos.usdValue || pos.collateralValue;
     const parsedValue = parseFloat(usdValue?.replace(/[k$,]/g, '') || 0) * (usdValue?.includes('k') ? 1000 : 1);
 
+    // Format rate/APY with proper % sign
+    const rate = pos.rate ? `${pos.rate}%` : (pos.apy ? `${pos.apy}%` : '-');
+
+    // Format health factor with color coding
+    const healthDisplay = pos.healthFactor ?
+      `<span class="${healthClass === 'positive' ? 'positive' : healthClass === 'negative' ? 'negative' : 'warning'}">${pos.healthFactor}</span>`
+      : '-';
+
+    // Format liquidation price with proper formatting
+    const liqPrice = pos.liquidationPrice ?
+      (parseFloat(pos.liquidationPrice) > 1000 ?
+        `$${parseFloat(pos.liquidationPrice).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+        : `$${parseFloat(pos.liquidationPrice).toFixed(2)}`)
+      : '-';
+
     return `
       <div class="position-item">
         <div class="position-header" style="flex: 0 0 200px;">
           <div class="position-pair">${asset} <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· ${pos.protocol}</span></div>
-          ${pos.healthFactor ? `<span class="position-badge ${healthClass === 'positive' ? 'in-range' : healthClass === 'negative' ? 'out-of-range' : 'critical'}" style="font-size: 0.625rem; padding: 2px 6px;">H: ${pos.healthFactor}</span>` : ''}
         </div>
         <div class="position-details">
           <div class="position-detail" style="flex: 0 0 140px;">
             <span class="detail-value">${amount} ${asset}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 120px;">
+          <div class="position-detail" style="flex: 0 0 110px;">
             <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 100px;">
-            <span class="detail-value">${pos.apy || pos.rate ? (pos.apy || pos.rate + '%') : '-'}</span>
+          <div class="position-detail" style="flex: 0 0 90px;">
+            <span class="detail-value">${rate}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 140px;">
+          <div class="position-detail" style="flex: 0 0 130px;">
             <span class="detail-value">${pos.loanAsset ? `${pos.loanAmount} ${pos.loanAsset}` : '-'}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 100px;">
+          <div class="position-detail" style="flex: 0 0 80px;">
             <span class="detail-value">${pos.ltv ? pos.ltv + '%' : '-'}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 120px;">
-            <span class="detail-value">${pos.liquidationPrice || '-'}</span>
+          <div class="position-detail" style="flex: 0 0 90px;">
+            <span class="detail-value">${healthDisplay}</span>
           </div>
-          <div class="position-detail" style="flex: 0 0 100px;">
-            <span class="detail-value">${pos.utilization ? pos.utilization + '%' : '-'}</span>
+          <div class="position-detail" style="flex: 0 0 110px;">
+            <span class="detail-value">${liqPrice}</span>
+          </div>
+          <div class="position-detail" style="flex: 0 0 80px;">
+            <span class="detail-value">${pos.liquidationLTV ? pos.liquidationLTV + '%' : '-'}</span>
           </div>
         </div>
       </div>
