@@ -123,33 +123,21 @@ async function loadAllPositions() {
   console.log('📊 Loading all positions...');
 
   try {
-    // OPTIMIZATION: Check if we have cached CLM positions first
-    // If yes, we can skip fetching captures entirely (unless we need hedge/collateral)
-    const hasCachedPositions = typeof window.hasCachedData === 'function' && window.hasCachedData();
-
-    let captures = [];
-    let needCaptures = false;
-
     // Load CLM positions first (from positions table with cache)
     await loadCLMPositions();
 
-    // Only fetch captures if we actually need them for hedge/collateral positions
-    // We can optimize this further by checking if user has hedge/collateral positions
-    // For now, we'll fetch captures only if cache wasn't available (first load)
-    if (!hasCachedPositions) {
-      console.log('🔍 First load detected, fetching captures for hedge/collateral data');
-      try {
-        captures = await window.getCaptures({ limit: 100 });
-        console.log(`Found ${captures?.length || 0} captures for hedge/collateral`);
-      } catch (e) {
-        console.warn('⚠️ Failed to load captures, continuing with CLM positions only:', e?.message || e);
-        captures = [];
-      }
-    } else {
-      console.log('⚡ Cache available, skipping captures fetch (instant load)');
+    // ALWAYS fetch captures for hedge/collateral positions
+    // The captures are cached for 5 minutes, so this is fast on subsequent loads
+    let captures = [];
+    try {
+      captures = await window.getCaptures({ limit: 100 });
+      console.log(`📦 Loaded ${captures?.length || 0} captures (cached for hedge/collateral data)`);
+    } catch (e) {
+      console.warn('⚠️ Failed to load captures, continuing with CLM positions only:', e?.message || e);
+      captures = [];
     }
 
-    // Load Hedge positions (from captures) - only if we have captures
+    // Load Hedge positions (from captures)
     if (captures && captures.length > 0) {
       await loadHedgePositions(captures);
     } else {
@@ -157,7 +145,7 @@ async function loadAllPositions() {
       renderHedgePositions();
     }
 
-    // Load Collateral positions (from captures) - only if we have captures
+    // Load Collateral positions (from captures)
     if (captures && captures.length > 0) {
       await loadCollateralPositions(captures);
     } else {
@@ -508,54 +496,82 @@ function renderHedgePositions() {
     return;
   }
 
-  list.innerHTML = hedgePositions.map(pos => {
+  // Create header row
+  const headerRow = `
+    <div class="position-header-row">
+      <div class="position-header" style="flex: 0 0 200px;">
+        <span class="header-label">Symbol</span>
+      </div>
+      <div class="position-details">
+        <div class="position-detail" style="flex: 0 0 120px;">
+          <span class="header-label">Size</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 120px;">
+          <span class="header-label">Value</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 140px;">
+          <span class="header-label">PnL</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 110px;">
+          <span class="header-label">Entry</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 110px;">
+          <span class="header-label">Mark</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 110px;">
+          <span class="header-label">Liq.</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 110px;">
+          <span class="header-label">Margin</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 100px;">
+          <span class="header-label">Funding</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const positionRows = hedgePositions.map(pos => {
     const pnlValue = parseFloat(pos.pnl?.replace(/[$,]/g, '')) || 0;
     const pnlClass = pnlValue >= 0 ? 'positive' : 'negative';
 
     return `
       <div class="position-item">
-        <div class="position-header">
-          <div class="position-pair">${pos.symbol} <span style="color: var(--text-muted); font-weight: 400;">· Hyperliquid</span></div>
-          <span class="position-badge" style="background: #fef3c7; color: #92400e;">${pos.leverage} Leverage</span>
+        <div class="position-header" style="flex: 0 0 200px;">
+          <div class="position-pair">${pos.symbol} <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· Hyperliquid</span></div>
+          <span class="position-badge" style="background: #fef3c7; color: #92400e; font-size: 0.625rem; padding: 2px 6px;">${pos.leverage}</span>
         </div>
         <div class="position-details">
-          <div class="position-detail">
-            <div class="detail-label">Size</div>
-            <div class="detail-value">${pos.size} ${pos.symbol}</div>
+          <div class="position-detail" style="flex: 0 0 120px;">
+            <span class="detail-value">${pos.size} ${pos.symbol}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">USD Value</div>
-            <div class="detail-value">$${(pos.usdValue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div class="position-detail" style="flex: 0 0 120px;">
+            <span class="detail-value">$${(pos.usdValue || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">PnL</div>
-            <div class="detail-value ${pnlClass}">${pos.pnl || '$0'} (${pos.pnlPercent || '0'}%)</div>
+          <div class="position-detail" style="flex: 0 0 140px;">
+            <span class="detail-value ${pnlClass}">${pos.pnl || '$0'} <span style="color: var(--text-muted); font-size: 0.625rem;">(${pos.pnlPercent || '0'}%)</span></span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">Entry Price</div>
-            <div class="detail-value">${(pos.entryPrice || 0).toLocaleString()}</div>
+          <div class="position-detail" style="flex: 0 0 110px;">
+            <span class="detail-value">${(pos.entryPrice || 0).toLocaleString()}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">Mark Price</div>
-            <div class="detail-value">${(pos.markPrice || 0).toLocaleString()}</div>
+          <div class="position-detail" style="flex: 0 0 110px;">
+            <span class="detail-value">${(pos.markPrice || 0).toLocaleString()}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">Liquidation</div>
-            <div class="detail-value">${(pos.liquidationPrice || 0).toLocaleString()}</div>
+          <div class="position-detail" style="flex: 0 0 110px;">
+            <span class="detail-value">${(pos.liquidationPrice || 0).toLocaleString()}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">Margin</div>
-            <div class="detail-value">$${(pos.margin || 0).toLocaleString()}</div>
+          <div class="position-detail" style="flex: 0 0 110px;">
+            <span class="detail-value">$${(pos.margin || 0).toLocaleString()}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">Funding Rate</div>
-            <div class="detail-value">${pos.fundingRate || 'N/A'}</div>
+          <div class="position-detail" style="flex: 0 0 100px;">
+            <span class="detail-value">${pos.fundingRate || 'N/A'}</span>
           </div>
         </div>
       </div>
     `;
   }).join('');
 
+  list.innerHTML = headerRow + positionRows;
   updateHedgeMetrics();
 }
 
@@ -569,7 +585,39 @@ function renderCollateralPositions() {
     return;
   }
 
-  list.innerHTML = collateralPositions.map(pos => {
+  // Create header row
+  const headerRow = `
+    <div class="position-header-row">
+      <div class="position-header" style="flex: 0 0 200px;">
+        <span class="header-label">Asset</span>
+      </div>
+      <div class="position-details">
+        <div class="position-detail" style="flex: 0 0 140px;">
+          <span class="header-label">Amount</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 120px;">
+          <span class="header-label">Value</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 100px;">
+          <span class="header-label">APY/Rate</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 140px;">
+          <span class="header-label">Loan</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 100px;">
+          <span class="header-label">LTV</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 120px;">
+          <span class="header-label">Liq. Price</span>
+        </div>
+        <div class="position-detail" style="flex: 0 0 100px;">
+          <span class="header-label">Util.</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const positionRows = collateralPositions.map(pos => {
     const healthValue = parseFloat(pos.healthFactor);
     let healthClass = '';
     if (!isNaN(healthValue)) {
@@ -582,57 +630,42 @@ function renderCollateralPositions() {
     const asset = pos.asset || pos.collateralAsset;
     const amount = pos.amount || pos.collateralAmount;
     const usdValue = pos.usdValue || pos.collateralValue;
+    const parsedValue = parseFloat(usdValue?.replace(/[k$,]/g, '') || 0) * (usdValue?.includes('k') ? 1000 : 1);
 
     return `
       <div class="position-item">
-        <div class="position-header">
-          <div class="position-pair">${asset} <span style="color: var(--text-muted); font-weight: 400;">· ${pos.protocol}</span></div>
-          ${pos.healthFactor ? `<span class="position-badge ${healthClass === 'positive' ? 'in-range' : healthClass === 'negative' ? 'out-of-range' : 'critical'}">Health: ${pos.healthFactor}</span>` : ''}
+        <div class="position-header" style="flex: 0 0 200px;">
+          <div class="position-pair">${asset} <span style="color: var(--text-muted); font-weight: 400; font-size: 0.625rem;">· ${pos.protocol}</span></div>
+          ${pos.healthFactor ? `<span class="position-badge ${healthClass === 'positive' ? 'in-range' : healthClass === 'negative' ? 'out-of-range' : 'critical'}" style="font-size: 0.625rem; padding: 2px 6px;">H: ${pos.healthFactor}</span>` : ''}
         </div>
         <div class="position-details">
-          <div class="position-detail">
-            <div class="detail-label">Amount</div>
-            <div class="detail-value">${amount} ${asset}</div>
+          <div class="position-detail" style="flex: 0 0 140px;">
+            <span class="detail-value">${amount} ${asset}</span>
           </div>
-          <div class="position-detail">
-            <div class="detail-label">USD Value</div>
-            <div class="detail-value">$${parseFloat(usdValue?.replace(/[k$,]/g, '') || 0) * (usdValue?.includes('k') ? 1000 : 1).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div class="position-detail" style="flex: 0 0 120px;">
+            <span class="detail-value">$${parsedValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
           </div>
-          ${pos.apy ? `
-          <div class="position-detail">
-            <div class="detail-label">APY</div>
-            <div class="detail-value">${pos.apy}</div>
-          </div>` : ''}
-          ${pos.rate ? `
-          <div class="position-detail">
-            <div class="detail-label">Rate</div>
-            <div class="detail-value">${pos.rate}%</div>
-          </div>` : ''}
-          ${pos.loanAsset ? `
-          <div class="position-detail">
-            <div class="detail-label">Loan</div>
-            <div class="detail-value">${pos.loanAmount} ${pos.loanAsset}</div>
-          </div>` : ''}
-          ${pos.ltv ? `
-          <div class="position-detail">
-            <div class="detail-label">LTV</div>
-            <div class="detail-value">${pos.ltv}%</div>
-          </div>` : ''}
-          ${pos.liquidationPrice ? `
-          <div class="position-detail">
-            <div class="detail-label">Liq Price</div>
-            <div class="detail-value">${pos.liquidationPrice}</div>
-          </div>` : ''}
-          ${pos.utilization ? `
-          <div class="position-detail">
-            <div class="detail-label">Utilization</div>
-            <div class="detail-value">${pos.utilization}%</div>
-          </div>` : ''}
+          <div class="position-detail" style="flex: 0 0 100px;">
+            <span class="detail-value">${pos.apy || pos.rate ? (pos.apy || pos.rate + '%') : '-'}</span>
+          </div>
+          <div class="position-detail" style="flex: 0 0 140px;">
+            <span class="detail-value">${pos.loanAsset ? `${pos.loanAmount} ${pos.loanAsset}` : '-'}</span>
+          </div>
+          <div class="position-detail" style="flex: 0 0 100px;">
+            <span class="detail-value">${pos.ltv ? pos.ltv + '%' : '-'}</span>
+          </div>
+          <div class="position-detail" style="flex: 0 0 120px;">
+            <span class="detail-value">${pos.liquidationPrice || '-'}</span>
+          </div>
+          <div class="position-detail" style="flex: 0 0 100px;">
+            <span class="detail-value">${pos.utilization ? pos.utilization + '%' : '-'}</span>
+          </div>
         </div>
       </div>
     `;
   }).join('');
 
+  list.innerHTML = headerRow + positionRows;
   updateCollateralMetrics();
 }
 
