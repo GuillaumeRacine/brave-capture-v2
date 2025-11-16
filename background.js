@@ -533,7 +533,66 @@ ${JSON.stringify(textData, null, 2)}
 
 Use this text data to help match and verify the visual information from the screenshot.` : '';
 
-  const prompt = `You are analyzing a DeFi portfolio page showing CLM (Concentrated Liquidity Market) positions.
+  // Determine if this is a lending protocol or CLM protocol
+  const isLendingProtocol = ['Aave', 'Morpho'].includes(protocol);
+
+  // Use different prompts for lending vs CLM protocols
+  const prompt = isLendingProtocol ?
+    `You are analyzing a ${protocol} lending/borrowing page showing collateral and loan positions.
+
+You have BOTH a screenshot AND text data extracted from the page. Use BOTH sources to extract complete, accurate data.${textContext}
+
+Analyze the screenshot and text to extract ALL positions.
+
+For ${protocol === 'Aave' ? 'Aave supply positions' : 'Morpho borrow positions'}, extract:
+${protocol === 'Aave' ? `
+1. **asset** - Token symbol (e.g., "wstETH", "ETH", "USDC")
+2. **amount** - Amount of tokens supplied
+3. **usdValue** - USD value of the supply
+4. **apy** - Supply APY percentage
+5. **type** - Always "supply"
+
+Return ONLY a JSON array (no markdown):
+[
+  {
+    "asset": "wstETH",
+    "amount": "16.5",
+    "usdValue": "50073.87",
+    "apy": "0.02",
+    "type": "supply"
+  }
+]` : `
+1. **collateralAsset** - Collateral token (e.g., "wstETH", "cbBTC")
+2. **collateralAmount** - Amount of collateral
+3. **collateralValue** - USD value (can include 'k' suffix like "68.97k")
+4. **loanAsset** - Borrowed token (e.g., "USDC")
+5. **loanAmount** - Amount borrowed (can include 'k' suffix)
+6. **loanValue** - USD value of loan (can include 'k' suffix)
+7. **rate** - Borrow rate percentage
+8. **ltv** - Loan-to-value percentage
+9. **liquidationLTV** - Max LTV before liquidation
+10. **liquidationPrice** - Price at which liquidation occurs
+11. **utilization** - Utilization percentage
+12. **type** - Always "lending"
+
+Return ONLY a JSON array (no markdown):
+[
+  {
+    "collateralAsset": "wstETH",
+    "collateralAmount": "17.9451",
+    "collateralValue": "68.97k",
+    "loanAsset": "USDC",
+    "loanAmount": "25037.45",
+    "loanValue": "25.03k",
+    "rate": "4.15",
+    "ltv": "36.35",
+    "liquidationLTV": "86",
+    "liquidationPrice": "1622.35",
+    "utilization": "80.97",
+    "type": "lending"
+  }
+]`}`
+    : `You are analyzing a DeFi portfolio page showing CLM (Concentrated Liquidity Market) positions.
 
 You have BOTH a screenshot AND text data extracted from the page. Use BOTH sources to extract complete, accurate data.${textContext}
 
@@ -654,58 +713,102 @@ Return ONLY a JSON array (no markdown, no explanation):
     const timestamp = new Date().toISOString();
     let savedCount = 0;
 
-    for (const pos of extractedPositions) {
+    // For lending protocols (Aave, Morpho), update the capture's content instead of positions table
+    if (isLendingProtocol) {
       try {
-        // Extract individual token names from pair (e.g., "SOL/USDC" -> "SOL", "USDC")
-        const pairParts = (pos.pair || '').split('/');
-        const token0 = (pairParts[0] || '').trim();
-        const token1 = (pairParts[1] || '').trim();
+        const contentKey = protocol === 'Aave' ? 'aavePositions' : 'morphoPositions';
 
-        const { error } = await supabase
-          .from('positions')
-          .insert({
-            capture_id: captureId,  // REQUIRED: Foreign key to captures table
-            pair: pos.pair,
-            token0: token0,  // Individual token names for display
-            token1: token1,
-            protocol: protocol,
-            balance: pos.balance,
-            pending_yield: pos.pendingYield,
-            apy: pos.apy,
-            current_price: pos.currentPrice,
-            range_min: pos.rangeMin,
-            range_max: pos.rangeMax,
-            in_range: pos.inRange,
-            token0_amount: pos.token0Amount,
-            token1_amount: pos.token1Amount,
-            token0_value: pos.token0Value,
-            token1_value: pos.token1Value,
-            token0_percentage: pos.token0Percentage,
-            token1_percentage: pos.token1Percentage,
-            captured_at: timestamp
-          });
+        // Get current capture data
+        const { data: currentCapture } = await supabase
+          .from('captures')
+          .select('data')
+          .eq('id', captureId)
+          .single();
 
-        if (error) {
-          console.error(`❌ Error saving ${pos.pair}:`, error);
-        } else {
-          console.log(`✅ Saved ${pos.pair} to database`);
-          savedCount++;
+        if (currentCapture) {
+          const updatedData = { ...currentCapture.data };
+          if (!updatedData.content) updatedData.content = {};
+
+          updatedData.content[contentKey] = {
+            positions: extractedPositions,
+            positionCount: extractedPositions.length,
+            totalValue: protocol === 'Aave' ?
+              extractedPositions.reduce((sum, p) => sum + parseFloat(p.usdValue || 0), 0).toFixed(2) :
+              (extractedPositions[0]?.collateralValue || '0')
+          };
+
+          const { error } = await supabase
+            .from('captures')
+            .update({ data: updatedData })
+            .eq('id', captureId);
+
+          if (error) {
+            console.error(`❌ Error updating ${protocol} capture:`, error);
+          } else {
+            console.log(`✅ Updated ${protocol} capture with ${extractedPositions.length} positions`);
+            savedCount = extractedPositions.length;
+          }
         }
       } catch (err) {
-        console.error(`❌ Exception saving ${pos.pair}:`, err);
+        console.error(`❌ Exception updating ${protocol} capture:`, err);
+      }
+    } else {
+      // For CLM protocols, save to positions table
+      for (const pos of extractedPositions) {
+        try {
+          // Extract individual token names from pair (e.g., "SOL/USDC" -> "SOL", "USDC")
+          const pairParts = (pos.pair || '').split('/');
+          const token0 = (pairParts[0] || '').trim();
+          const token1 = (pairParts[1] || '').trim();
+
+          const { error } = await supabase
+            .from('positions')
+            .insert({
+              capture_id: captureId,  // REQUIRED: Foreign key to captures table
+              pair: pos.pair,
+              token0: token0,  // Individual token names for display
+              token1: token1,
+              protocol: protocol,
+              balance: pos.balance,
+              pending_yield: pos.pendingYield,
+              apy: pos.apy,
+              current_price: pos.currentPrice,
+              range_min: pos.rangeMin,
+              range_max: pos.rangeMax,
+              in_range: pos.inRange,
+              token0_amount: pos.token0Amount,
+              token1_amount: pos.token1Amount,
+              token0_value: pos.token0Value,
+              token1_value: pos.token1Value,
+              token0_percentage: pos.token0Percentage,
+              token1_percentage: pos.token1Percentage,
+              captured_at: timestamp
+            });
+
+          if (error) {
+            console.error(`❌ Error saving ${pos.pair}:`, error);
+          } else {
+            console.log(`✅ Saved ${pos.pair} to database`);
+            savedCount++;
+          }
+        } catch (err) {
+          console.error(`❌ Exception saving ${pos.pair}:`, err);
+        }
       }
     }
 
     console.log(`💾 Saved ${savedCount}/${extractedPositions.length} positions to database`);
 
-    // AUTOMATED QC: Validate and auto-fix data quality issues
-    if (savedCount > 0) {
+    // AUTOMATED QC: Validate and auto-fix data quality issues (only for CLM protocols)
+    if (savedCount > 0 && !isLendingProtocol) {
       try {
         await runAutoQC(supabase, captureId, extractedPositions);
       } catch (qcError) {
         console.error('⚠️ QC validation failed (non-fatal):', qcError);
         // Don't fail the whole operation if QC fails
       }
+    } else if (isLendingProtocol) {
+      console.log('✅ Lending protocol - QC not needed (data validated by AI extraction)');
     }
 
     return { success: true, positions: extractedPositions, savedCount };
