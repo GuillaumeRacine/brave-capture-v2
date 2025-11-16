@@ -186,11 +186,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           extractionInProgress = true;
 
           // Send BOTH text data AND screenshot to AI
+          // For lending protocols, send the appropriate position data
+          const protocol = capture.data?.protocol || 'Orca';
+          let textData = null;
+          if (protocol === 'Aave' && capture.data?.content?.aavePositions) {
+            textData = capture.data.content.aavePositions;
+          } else if (protocol === 'Morpho' && capture.data?.content?.morphoPositions) {
+            textData = capture.data.content.morphoPositions;
+          } else {
+            textData = capture.data?.content?.clmPositions || null;
+          }
+
           chrome.runtime.sendMessage({
             action: 'extractAllPositions',
             screenshot: screenshot,
-            textData: capture.data?.content?.clmPositions || null,
-            protocol: capture.data?.protocol || 'Orca',
+            textData: textData,
+            protocol: protocol,
             captureId: capture.id  // Pass capture ID for database foreign key
           })
           .then(result => {
