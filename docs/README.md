@@ -114,8 +114,13 @@ Automatic detection of:
 - Total portfolio value changes (>20%)
 
 ### 📱 Interactive Dashboard
-- **⚡ Instant loads** with persistent cache (99%+ faster after first visit)
-- **Smart caching:** Positions cached until new captures arrive
+- **⚡ Instant loads** with persistent cache (10-20x faster after first visit)
+- **Smart caching (NEW in v1.4.2):**
+  - First load: ~150-250ms (normal database fetch)
+  - Subsequent loads: **less than 10ms** (instant from cache)
+  - Early-exit cache logic skips all database operations
+  - Non-blocking background check for new captures
+  - Only refreshes when new data is actually available
 - **Compact table layout** optimized for many positions
 - **Auto-update:** Only refreshes positions when new captures detected
 - **Smart filtering:**
@@ -135,6 +140,17 @@ Automatic detection of:
 - Responsive design for mobile and desktop
 
 ### ⚡ Performance Optimizations
+
+**v1.4.2 - Dashboard Cache Performance (NEW):**
+- **Instant dashboard loads:** less than 10ms after first visit (10-20x faster)
+- **Early-exit cache logic:** Skips all database operations when cache is available
+- **Smart invalidation:** All-or-nothing cache strategy prevents inconsistent data
+- **Non-blocking updates:** Background check for new captures after 100ms delay
+- **Performance metrics:**
+  - First load: ~150-250ms (database fetch)
+  - Cached load: **less than 10ms** ⚡ (instant)
+  - Improvement: 90-95% faster on repeat visits
+- **See:** `CHANGELOG-v1.4.2.md` for detailed implementation
 
 **v1.4 - Persistent Cache System:**
 - **Instant dashboard loads:** 0ms after first visit (99%+ faster)
@@ -521,6 +537,12 @@ MIT License - Feel free to modify and distribute
 Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
 
 ## Changelog
+
+### Recent Releases
+- **v1.4.2** (Nov 16, 2025) - Dashboard cache performance optimization ([CHANGELOG-v1.4.2.md](CHANGELOG-v1.4.2.md))
+- **v1.4.1** (Nov 16, 2025) - Price slider fixes and Hyperliquid improvements ([CHANGELOG-v1.4.1.md](CHANGELOG-v1.4.1.md))
+- **v1.4.0** (Nov 15, 2025) - Automated QC system and quality control ([CHANGELOG-v1.4.0.md](CHANGELOG-v1.4.0.md))
+- **v1.3.1** (Nov 15, 2025) - Token extraction and balance calculations ([CHANGELOG-v1.3.1.md](CHANGELOG-v1.3.1.md))
 
 See `CHANGES.md` for detailed version history and updates.
 

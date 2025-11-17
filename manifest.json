@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Brave Capture - CLM Position Tracker",
-  "version": "1.4.0",
-  "description": "Track Concentrated Liquidity Market Maker (CLM) positions across 9 DeFi protocols with AI-powered extraction and automated quality control",
+  "version": "1.5.1",
+  "description": "Track Concentrated Liquidity Market Maker (CLM) positions across 9 DeFi protocols with AI-powered extraction, automated quality control, and unified token exposure tracking",
 
   "permissions": [
     "activeTab",

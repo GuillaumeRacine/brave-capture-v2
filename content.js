@@ -2963,149 +2963,116 @@ function captureText() {
 }
 
 function captureHyperliquidPositions() {
-  console.log('Hyperliquid: Parsing positions');
+  console.log('Hyperliquid: Parsing positions from table');
 
   const positions = [];
-  const summary = {};
 
-  // Get all text content for easier parsing
-  const pageText = document.body.innerText || document.body.textContent || '';
-  console.log('Hyperliquid: Page text length:', pageText.length);
-
-  // Look for position rows
-  // Hyperliquid displays positions in a table/list format
-  // Each position has: symbol, leverage, size, USD value, entry price, mark price, PnL, liquidation, margin, funding
-
-  const allElements = document.querySelectorAll('div, span, td, tr');
-
-  let currentPosition = null;
-  const positionData = [];
-
-  // Common crypto symbols to detect
-  const cryptoSymbols = ['BTC', 'ETH', 'SOL', 'APT', 'SUI', 'PUMP', 'AVAX', 'ARB', 'OP', 'MATIC', 'LINK', 'UNI', 'AAVE'];
-
-  allElements.forEach(el => {
-    const text = (el.innerText || el.textContent || '').trim();
-
-    // Detect position by crypto symbol followed by leverage (e.g., "BTC  20x")
-    const symbolMatch = text.match(/^(BTC|ETH|SOL|APT|SUI|PUMP|AVAX|ARB|OP|MATIC|LINK|UNI|AAVE)\s+(\d+)x/);
-    if (symbolMatch) {
-      // If we have a current position, save it
-      if (currentPosition && currentPosition.symbol) {
-        positionData.push({...currentPosition});
-      }
-
-      // Start new position
-      currentPosition = {
-        symbol: symbolMatch[1],
-        leverage: symbolMatch[2] + 'x'
-      };
-      console.log('Hyperliquid: Found position:', currentPosition.symbol, currentPosition.leverage);
-    }
-
-    // Parse position size (e.g., "0.28732 BTC", "179.08 SOL")
-    if (currentPosition && !currentPosition.size) {
-      const sizeMatch = text.match(/^([0-9,]+\.?[0-9]*)\s+(BTC|ETH|SOL|APT|SUI|PUMP|AVAX|ARB|OP|MATIC|LINK|UNI|AAVE)/);
-      if (sizeMatch && sizeMatch[2] === currentPosition.symbol) {
-        currentPosition.size = sizeMatch[1];
-        console.log('Hyperliquid: Found size:', currentPosition.size, currentPosition.symbol);
-      }
-    }
-
-    // Parse USD value (e.g., "30,033.85 USDC")
-    if (currentPosition && !currentPosition.usdValue) {
-      const usdMatch = text.match(/^([0-9,]+\.?[0-9]*)\s+USDC$/);
-      if (usdMatch) {
-        currentPosition.usdValue = usdMatch[1].replace(/,/g, '');
-        console.log('Hyperliquid: Found USD value:', currentPosition.usdValue);
-      }
-    }
-
-    // Parse entry price (first price number after USD value)
-    if (currentPosition && currentPosition.usdValue && !currentPosition.entryPrice) {
-      const priceMatch = text.match(/^([0-9,]+\.?[0-9]*)$/);
-      if (priceMatch) {
-        currentPosition.entryPrice = priceMatch[1].replace(/,/g, '');
-        console.log('Hyperliquid: Found entry price:', currentPosition.entryPrice);
-      }
-    }
-
-    // Parse mark price (second price after entry)
-    if (currentPosition && currentPosition.entryPrice && !currentPosition.markPrice) {
-      const priceMatch = text.match(/^([0-9,]+\.?[0-9]*)$/);
-      if (priceMatch && priceMatch[1] !== currentPosition.entryPrice) {
-        currentPosition.markPrice = priceMatch[1].replace(/,/g, '');
-        console.log('Hyperliquid: Found mark price:', currentPosition.markPrice);
-      }
-    }
-
-    // Parse PnL (e.g., "-$73.93 (-4.9%)")
-    if (currentPosition && !currentPosition.pnl) {
-      const pnlMatch = text.match(/^(-?\$[0-9,]+\.?[0-9]*)\s+\((-?[0-9.]+)%\)/);
-      if (pnlMatch) {
-        currentPosition.pnl = pnlMatch[1];
-        currentPosition.pnlPercent = pnlMatch[2];
-        console.log('Hyperliquid: Found PnL:', currentPosition.pnl, currentPosition.pnlPercent + '%');
-      }
-    }
-
-    // Parse liquidation price
-    if (currentPosition && !currentPosition.liquidationPrice) {
-      const liqMatch = text.match(/^([0-9,]+\.?[0-9]*)$/);
-      if (liqMatch && currentPosition.markPrice && liqMatch[1] !== currentPosition.markPrice && liqMatch[1] !== currentPosition.entryPrice) {
-        currentPosition.liquidationPrice = liqMatch[1].replace(/,/g, '');
-        console.log('Hyperliquid: Found liquidation price:', currentPosition.liquidationPrice);
-      }
-    }
-
-    // Parse margin (e.g., "$1,501.69 (Cross)")
-    if (currentPosition && !currentPosition.margin) {
-      const marginMatch = text.match(/^\$([0-9,]+\.?[0-9]*)\s+\((Cross|Isolated)\)/);
-      if (marginMatch) {
-        currentPosition.margin = marginMatch[1].replace(/,/g, '');
-        currentPosition.marginType = marginMatch[2];
-        console.log('Hyperliquid: Found margin:', currentPosition.margin, currentPosition.marginType);
-      }
-    }
-
-    // Parse funding rate (e.g., "$27.27", "-$13.47")
-    if (currentPosition && !currentPosition.fundingRate) {
-      const fundingMatch = text.match(/^(-?\$[0-9,]+\.?[0-9]*)$/);
-      if (fundingMatch && currentPosition.margin) {
-        currentPosition.fundingRate = fundingMatch[1];
-        console.log('Hyperliquid: Found funding:', currentPosition.fundingRate);
-      }
-    }
-  });
-
-  // Save last position
-  if (currentPosition && currentPosition.symbol) {
-    positionData.push({...currentPosition});
+  // Get table element (Hyperliquid has one main positions table)
+  const tables = document.querySelectorAll('table');
+  if (tables.length === 0) {
+    console.log('Hyperliquid: No table found');
+    return { positions: [], summary: {}, positionCount: 0 };
   }
 
-  // Convert to standard format
-  positionData.forEach(pos => {
-    if (pos.symbol && pos.usdValue) {
+  const table = tables[0];
+  const rows = table.querySelectorAll('tbody tr');
+
+  console.log(`Hyperliquid: Found ${rows.length} table rows`);
+
+  rows.forEach((row, index) => {
+    try {
+      const cells = row.querySelectorAll('td');
+      if (cells.length < 9) {
+        console.log(`Hyperliquid: Skipping row ${index} - only ${cells.length} cells`);
+        return;
+      }
+
+      // Column 0: "ETH  20x"
+      const coinText = cells[0]?.textContent?.trim() || '';
+      const coinMatch = coinText.match(/^([A-Z]+)\s+(\d+)x$/);
+      if (!coinMatch) {
+        console.log(`Hyperliquid: Could not parse symbol from "${coinText}"`);
+        return;
+      }
+
+      const symbol = coinMatch[1];
+      const leverage = coinMatch[2] + 'x';
+
+      // Column 1: "9.3792 ETH"
+      const sizeText = cells[1]?.textContent?.trim() || '';
+      const sizeMatch = sizeText.match(/^([0-9,]+\.?[0-9]*)/);
+      const size = sizeMatch ? sizeMatch[1].replace(/,/g, '') : '0';
+
+      // Column 2: "29,481.64 USDC"
+      const valueText = cells[2]?.textContent?.trim() || '';
+      const valueMatch = valueText.match(/^([0-9,]+\.?\d*)/);
+      const usdValue = valueMatch ? parseFloat(valueMatch[1].replace(/,/g, '')) : 0;
+
+      // Column 3: Entry Price
+      const entryText = cells[3]?.textContent?.trim() || '';
+      const entryPrice = parseFloat(entryText.replace(/,/g, '')) || 0;
+
+      // Column 4: Mark Price
+      const markText = cells[4]?.textContent?.trim() || '';
+      const markPrice = parseFloat(markText.replace(/,/g, '')) || 0;
+
+      // Column 5: "+$2,771.75 (+171.9%)" ← CRITICAL FIX
+      const pnlText = cells[5]?.textContent?.trim() || '';
+      const pnlMatch = pnlText.match(/([+-]?\$[\d,]+\.?\d*)\s+\(([+-]?[\d.]+)%\)/);
+
+      let pnl = '$0';
+      let pnlPercent = '0';
+
+      if (pnlMatch) {
+        pnl = pnlMatch[1];           // "+$2,771.75"
+        pnlPercent = pnlMatch[2];    // "+171.9"
+      } else {
+        console.log(`Hyperliquid: Could not parse P&L from "${pnlText}"`);
+      }
+
+      // Column 6: Liquidation Price
+      const liqText = cells[6]?.textContent?.trim() || '';
+      const liquidationPrice = parseFloat(liqText.replace(/,/g, '')) || 0;
+
+      // Column 7: "$1,474.08 (Cross)"
+      const marginText = cells[7]?.textContent?.trim() || '';
+      const marginMatch = marginText.match(/\$([0-9,]+\.?\d*)\s+\((\w+)\)/);
+
+      let margin = 0;
+      let marginType = 'Cross';
+
+      if (marginMatch) {
+        margin = parseFloat(marginMatch[1].replace(/,/g, ''));
+        marginType = marginMatch[2];
+      }
+
+      // Column 8: Funding
+      const fundingText = cells[8]?.textContent?.trim() || '';
+      const fundingRate = fundingText || '$0';
+
       const position = {
-        symbol: pos.symbol,
-        leverage: pos.leverage || 'N/A',
-        size: pos.size || 'N/A',
-        usdValue: parseFloat(pos.usdValue) || 0,
-        entryPrice: parseFloat(pos.entryPrice) || 0,
-        markPrice: parseFloat(pos.markPrice) || 0,
-        pnl: pos.pnl || '$0',
-        pnlPercent: pos.pnlPercent || '0',
-        liquidationPrice: parseFloat(pos.liquidationPrice) || 0,
-        margin: parseFloat(pos.margin) || 0,
-        marginType: pos.marginType || 'Cross',
-        fundingRate: pos.fundingRate || '$0',
+        symbol,
+        leverage,
+        size,
+        usdValue,
+        entryPrice,
+        markPrice,
+        pnl,
+        pnlPercent,
+        liquidationPrice,
+        margin,
+        marginType,
+        fundingRate,
         capturedAt: new Date().toISOString()
       };
+
       positions.push(position);
+      console.log(`Hyperliquid: Parsed ${symbol}: ${pnl} (${pnlPercent}%)`);
+
+    } catch (error) {
+      console.error(`Hyperliquid: Error parsing row ${index}:`, error);
     }
   });
-
-  console.log('Hyperliquid: Found', positions.length, 'positions');
 
   // Calculate summary
   const totalValue = positions.reduce((sum, p) => sum + p.usdValue, 0);
@@ -3113,21 +3080,24 @@ function captureHyperliquidPositions() {
     const pnl = parseFloat(p.pnl.replace(/[$,]/g, ''));
     return sum + pnl;
   }, 0);
-  const totalMargin = positions.reduce((sum, p) => sum + p.margin, 0);
+  const totalMargin = positions.reduce((sum, p) => sum + (p.margin || 0), 0);
+  const avgLeverage = positions.length > 0
+    ? (positions.reduce((sum, p) => sum + parseInt(p.leverage), 0) / positions.length)
+    : 0;
 
-  summary.totalPositions = positions.length;
-  summary.totalValue = totalValue.toFixed(2);
-  summary.totalPnL = totalPnL.toFixed(2);
-  summary.totalMargin = totalMargin.toFixed(2);
-  summary.avgLeverage = positions.length > 0
-    ? (positions.reduce((sum, p) => sum + parseInt(p.leverage), 0) / positions.length).toFixed(1)
-    : '0';
+  const summary = {
+    totalPositions: positions.length,
+    totalValue: totalValue.toFixed(2),
+    totalPnL: totalPnL.toFixed(2),
+    totalMargin: totalMargin.toFixed(2),
+    avgLeverage: avgLeverage.toFixed(1)
+  };
 
-  console.log('Hyperliquid Summary:', summary);
+  console.log(`Hyperliquid: Found ${positions.length} positions, Total P&L: $${totalPnL.toFixed(2)}`);
 
   return {
-    summary: summary,
-    positions: positions,
+    summary,
+    positions,
     positionCount: positions.length,
     totalValue: summary.totalValue,
     totalPnL: summary.totalPnL
@@ -3274,13 +3244,14 @@ function captureAavePositions() {
     return pos.asset && pos.amount && pos.usdValue && parseFloat(pos.usdValue) > 0;
   });
 
-  // Deduplicate by asset name (keep first occurrence which usually has the most complete data)
+  // Deduplicate by asset name AND type (supply/borrow are separate positions)
   const seenAssets = new Set();
   const uniquePositions = completePositions.filter(pos => {
-    if (seenAssets.has(pos.asset)) {
+    const key = `${pos.asset}-${pos.type}`;  // Use both asset and type as key
+    if (seenAssets.has(key)) {
       return false;
     }
-    seenAssets.add(pos.asset);
+    seenAssets.add(key);
     return true;
   });
 

@@ -1,7 +1,7 @@
 {
   "name": "brave-capture-v2",
-  "version": "1.4.0",
-  "description": "Chrome extension for capturing and tracking CLM positions across 9 DeFi protocols with AI-powered extraction and automated quality control",
+  "version": "1.5.1",
+  "description": "Chrome extension for capturing and tracking CLM positions across 9 DeFi protocols with AI-powered extraction, automated quality control, instant dashboard cache performance, and unified token exposure tracking",
   "repository": {
     "type": "git",
     "url": "https://github.com/GuillaumeRacine/brave-capture-v2.git"
@@ -19,7 +19,9 @@
     "test": "node tests/test-vision-flow.js",
     "test:db": "node tests/test-db-update.js",
     "test:integration": "node tests/test-integration.js",
-    "test:all": "npm run test && npm run test:db && npm run test:integration"
+    "test:parsers": "node tests/test-hyperliquid-parser.js && node tests/test-aave-deduplication.js && node tests/test-price-slider.js",
+    "test:tokens": "node tests/test-token-exposure.js",
+    "test:all": "npm run test && npm run test:db && npm run test:integration && npm run test:parsers && npm run test:tokens"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",

@@ -232,6 +232,10 @@
       background: var(--success);
     }
 
+    .card-icon.token {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
     .card-title-text h2 {
       font-size: 0.875rem;
       font-weight: 600;
@@ -730,6 +734,140 @@
       }
     }
 
+    /* Token Exposure Table - Compact Style */
+    .token-exposure-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .token-exposure-table thead {
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .token-exposure-table th {
+      padding: 6px 8px;
+      font-family: inherit;
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .token-exposure-table th:nth-child(1) {
+      text-align: left;
+    }
+
+    .token-exposure-table th:nth-child(2),
+    .token-exposure-table th:nth-child(3),
+    .token-exposure-table th:nth-child(4),
+    .token-exposure-table th:nth-child(5),
+    .token-exposure-table th:nth-child(6) {
+      text-align: right;
+    }
+
+    .token-exposure-table td {
+      padding: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .token-exposure-table tbody tr {
+      transition: all 0.15s;
+    }
+
+    .token-exposure-table tbody tr:hover {
+      background: var(--bg-card);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .token-exposure-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .token-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .token-icon-small {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .token-symbol-text {
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .price-cell {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .clm-usd-cell {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .clm-cell, .hedge-cell {
+      font-family: ui-monospace, 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, 'Courier New', monospace;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .hedge-cell.positive {
+      color: var(--success);
+      font-weight: 500;
+    }
+
+    .hedge-cell.negative {
+      color: var(--danger);
+      font-weight: 500;
+    }
+
+    .net-cell {
+      font-family: ui-monospace, 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, 'Courier New', monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .net-cell.positive {
+      color: var(--success);
+    }
+
+    .net-cell.negative {
+      color: var(--danger);
+    }
+
     /* Print Styles */
     @media print {
       body {
@@ -891,6 +1029,64 @@
             <!-- Collateral positions will be inserted here -->
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Token Exposure Card -->
+  <div class="position-card" id="tokenExposureCard">
+    <div class="card-header" data-target="tokenExposureCard">
+      <div class="card-title-row">
+        <div class="card-title">
+          <div class="card-icon token">🪙</div>
+          <div class="card-title-text">
+            <h2>Token Exposure</h2>
+            <p>Aggregated Holdings Across CLM & Hedges</p>
+          </div>
+        </div>
+        <div class="card-toggle">
+          <span class="toggle-text">Expand</span>
+          <span class="toggle-icon">▼</span>
+        </div>
+      </div>
+      <div class="card-metrics" id="tokenExposureMetrics">
+        <div class="metric">
+          <div class="metric-label">Total CLM Tokens</div>
+          <div class="metric-value" id="totalCLMTokens">-</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Total Hedge Tokens</div>
+          <div class="metric-value" id="totalHedgeTokens">-</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Combined Value</div>
+          <div class="metric-value" id="combinedTokenValue">$0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-content">
+      <div class="card-content-inner">
+        <!-- Token Exposure Table -->
+        <table class="token-exposure-table">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Price</th>
+              <th>CLM USD</th>
+              <th>CLM Exposure</th>
+              <th>Hedge Exposure</th>
+              <th>Net Exposure</th>
+            </tr>
+          </thead>
+          <tbody id="tokenExposureTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                Loading token exposure data...
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

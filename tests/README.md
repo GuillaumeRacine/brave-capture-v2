@@ -1,347 +1,180 @@
-# Test Suite for Brave Capture
+# Test Suite - Brave Capture v1.5.1
 
-## Overview
+Automated test suite for position parsers, UI calculations, and token exposure aggregation.
 
-This directory contains automated tests for the Brave Capture extension, with a focus on the Batch AI Vision Token Extraction feature.
+---
 
-## Test Files
+## 🎯 Quick Start
 
-### test-batch-extraction.js
+### Run All Tests
 
-Comprehensive test suite for batch extraction functionality.
-
-**Tests included:**
-1. Protocol detection
-2. Position discovery on page
-3. Position expansion (drawer opening)
-4. Token data visibility
-5. Drawer closing
-6. Screenshot capability
-
-**Usage:**
-
-1. Load the extension in Chrome
-2. Navigate to Orca positions page: https://www.orca.so/positions
-3. Open DevTools console (F12)
-4. Copy and paste the test script into console
-5. Run: `await testBatchExtraction()`
-
-**Expected output:**
-```
-=== BATCH EXTRACTION TEST SUITE ===
-
-Test 1: Protocol Detection
-✅ Detected Orca page
-
-Test 2: Position Discovery
-Found 15 table rows
-✅ Found 15 valid positions
-
-Test 3: Position Expansion
-Expanding position: SOL/USDC 0.30%
-✅ Position drawer opened successfully
-
-Test 4: Token Data in Drawer
-✅ Drawer contains token breakdown data
-
-Test 5: Close Drawer
-✅ Drawer closed successfully
-
-Test 6: Screenshot Capability
-✅ Screenshot test requires extension context
-   Manual verification: Open extension popup and check if screenshot button works
-
-=== TEST RESULTS SUMMARY ===
-✅ Passed: 6
-   - Protocol detection (Orca)
-   - Position discovery (15 positions)
-   - Position expansion
-   - Token data visibility
-   - Drawer close
-   - Screenshot capability (manual verification needed)
-
-Pass Rate: 100.0% (6/6)
+```bash
+npm run test:all
 ```
 
-## Running Individual Tests
+### Run Test Categories
 
-### Test Position Expansion
+```bash
+# Parser tests (Hyperliquid, Aave, Price Slider)
+npm run test:parsers
 
-```javascript
-// Test expanding the first position (index 0)
-await testPositionExpansion(0)
+# Token exposure tests (aggregation, consolidation, formatting)
+npm run test:tokens
 
-// Test expanding the third position
-await testPositionExpansion(2)
+# Vision flow tests
+npm run test
+
+# Database update tests
+npm run test:db
+
+# Integration tests
+npm run test:integration
 ```
 
-**Expected output:**
-```
-Testing expansion of position 0...
-Position: SOL/USDC 0.30%
-✅ Drawer opened
-Drawer content preview: SOL/USDC 0.30% Position Details Balance 5.234 SOL...
-```
+### Run Individual Tests
 
-### Test Drawer Close
+```bash
+# Hyperliquid P&L and leverage extraction
+node tests/test-hyperliquid-parser.js
 
-```javascript
-// Close currently open drawer
-await testCloseDrawer()
-```
+# Aave deduplication logic
+node tests/test-aave-deduplication.js
 
-**Expected output:**
-```
-Testing drawer close...
-Clicking close button
-✅ Drawer closed successfully
+# Price slider calculations
+node tests/test-price-slider.js
+
+# Token exposure card functionality
+node tests/test-token-exposure.js
+
+# Token card bug fixes
+node tests/test-token-card-fix.js
 ```
 
-## Manual Testing Checklist
+---
 
-Use this checklist when testing manually:
+## ✅ Current Test Results
 
-### Pre-test Setup
-- [ ] Extension loaded in Chrome
-- [ ] Navigated to Orca positions page
-- [ ] Logged in and positions visible
-- [ ] DevTools console open
+**Status:** ✅ **All tests passing** (30/30)
 
-### Test Batch Extraction Button
-- [ ] Click "Extract Token Data" button in popup
-- [ ] Confirmation dialog shows:
-  - [ ] Correct number of positions
-  - [ ] Cost estimate displayed
-  - [ ] Time estimate displayed
-- [ ] Click OK to start
-- [ ] Progress bar appears and updates
-- [ ] Success/fail counts update in real-time
-- [ ] Completion message shows final stats
-
-### Test Position Expansion
-- [ ] First position expands automatically
-- [ ] Drawer opens on right side
-- [ ] Drawer shows token breakdown
-- [ ] Screenshot is taken (check timing)
-- [ ] Drawer closes automatically
-- [ ] Next position expands
-- [ ] Process continues until complete
-
-### Test Error Handling
-- [ ] Close page mid-extraction - should stop gracefully
-- [ ] Refresh page mid-extraction - should stop gracefully
-- [ ] Network disconnect - should show error and continue
-- [ ] Invalid position - should skip and continue
-
-### Test Database Updates
-- [ ] Open Supabase dashboard
-- [ ] Check positions table
-- [ ] Verify token0_amount populated
-- [ ] Verify token1_amount populated
-- [ ] Verify token0_percentage populated
-- [ ] Verify token1_percentage populated
-- [ ] Verify correct pair name matched
-
-## Debugging Failed Tests
-
-### Test 1 Failed: Protocol Detection
-
-**Symptoms:**
 ```
-❌ Test 1 failed: Not on a supported protocol page
+Test Suite                    Tests    Passed    Failed    Rate
+────────────────────────────────────────────────────────────────
+test-hyperliquid-parser.js      9        9         0      100%
+test-aave-deduplication.js      5        5         0      100%
+test-price-slider.js            8        8         0      100%
+test-token-exposure.js          8        8         0      100%
+────────────────────────────────────────────────────────────────
+TOTAL                          30       30         0      100%
 ```
 
-**Solutions:**
-- Make sure you're on orca.so or uniswap.org
-- Check URL in address bar
-- Try refreshing the page
+---
 
-### Test 2 Failed: Position Discovery
+## 📊 Token Exposure Tests (v1.5.1)
 
-**Symptoms:**
-```
-❌ Test 2 failed: No position rows found
-```
+The `test-token-exposure.js` suite validates the Token Exposure Card functionality:
 
-**Solutions:**
-- Make sure you're on the positions page (not liquidity pools)
-- Log in to your account
-- Check if positions are visible in the UI
-- Try scrolling down to load positions
+### Test Coverage
 
-### Test 3 Failed: Position Expansion
+1. **CLM Token Counting** - Extracts all unique tokens from pairs
+2. **CLM Value Calculation** - Sums values across multiple positions
+3. **Missing Data Estimation** - Estimates when token data unavailable (~79% of positions)
+4. **Hedge Net Exposure** - Calculates long - short correctly
+5. **Symbol Normalization** - Handles wrapped variants (WETH, USDC.e, etc.)
+6. **CoinGecko Mapping** - Validates token ID mappings (60+ tokens)
+7. **Warning Threshold** - Shows warning when >50% estimated
+8. **Amount Formatting** - Formats decimals correctly (6, 4, 2, or 0 decimals based on size)
 
-**Symptoms:**
-```
-❌ Test 3 failed: Drawer did not open
+### Run Token Tests
+
+```bash
+npm run test:tokens
 ```
 
-**Solutions:**
-- Check if clicking the row manually opens drawer
-- Increase wait time in test (slow computer/network)
-- Check console for JavaScript errors
-- Try a different position (index 1, 2, etc.)
-
-### Test 4 Warning: Token data not visible
-
-**Symptoms:**
+**Expected Output:**
 ```
-⚠️ Warning: Drawer may not contain expected token data
-```
+🧪 Testing Token Exposure Card Functionality
+============================================================
+✅ PASSED: Should extract all unique tokens from CLM positions
+✅ PASSED: Should sum token values across multiple positions
+✅ PASSED: Should estimate token values when data is missing
+✅ PASSED: Should calculate net exposure (long - short) for hedge tokens
+✅ PASSED: Should normalize wrapped token variants
+✅ PASSED: Should have mappings for common tokens
+✅ PASSED: Should show warning when >50% of data is estimated
+✅ PASSED: Should format token amounts with appropriate decimal places
 
-**Solutions:**
-- Check if drawer shows percentages (%)
-- Check if drawer shows decimal numbers
-- Verify this is a CLM position (not regular swap)
-- Try expanding different positions
-
-## Performance Testing
-
-### Test Extraction Speed
-
-```javascript
-// Time a single position extraction
-console.time('Single extraction');
-
-// Expand position
-await testPositionExpansion(0);
-
-// Simulate screenshot + AI (add delays)
-await new Promise(r => setTimeout(r, 1000)); // Screenshot
-await new Promise(r => setTimeout(r, 500));  // AI processing
-
-// Close
-await testCloseDrawer();
-
-console.timeEnd('Single extraction');
-// Expected: 1500-2000ms
+Test Summary: 8/8 PASSED (100%)
+🎉 All tests passed! Token Exposure card logic is working correctly.
 ```
 
-### Test Batch Performance
+### What Gets Tested
 
-```javascript
-// Test 10 positions
-const start = Date.now();
+**Token Consolidation:**
+- WBTC, cbBTC, xBTC → BTC
+- WETH, whETH, STETH → ETH
+- USDC, USDT, DAI → USD (stablecoins)
 
-for (let i = 0; i < 10; i++) {
-  await testPositionExpansion(i);
-  await new Promise(r => setTimeout(r, 1000));
-  await testCloseDrawer();
-  await new Promise(r => setTimeout(r, 300));
-}
-
-const duration = (Date.now() - start) / 1000;
-console.log(`10 positions: ${duration}s (${(duration/10).toFixed(1)}s per position)`);
-// Expected: 13-15 seconds total, 1.3-1.5s per position
+**Net Exposure Calculation:**
+```
+Example:
+  10 ETH long + 3 ETH short = +7 ETH net (long bias)
+  0 SOL long + 200 SOL short = -200 SOL net (short bias)
 ```
 
-## CI/CD Integration
-
-Future: Integrate with automated testing tools
-
-### Puppeteer Example
-
-```javascript
-// TODO: Add Puppeteer test
-const puppeteer = require('puppeteer');
-
-async function runBatchTest() {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
-  // Load extension
-  // Navigate to Orca
-  // Run tests
-  // Capture results
-
-  await browser.close();
-}
+**Estimation Logic:**
+```
+When token data is missing:
+  SOL/USDC position with balance $8,000
+  → Estimate: SOL = $4,000, USDC = $4,000 (50/50 split)
 ```
 
-### Jest Example
+---
 
-```javascript
-// TODO: Add Jest test
-describe('Batch Extraction', () => {
-  test('should detect Orca protocol', () => {
-    // Test logic
-  });
+## 🧪 Test Files
 
-  test('should find positions on page', () => {
-    // Test logic
-  });
-});
-```
+### Parser Tests
 
-## Coverage Goals
+**test-hyperliquid-parser.js** (9 tests)
+- P&L extraction from Hyperliquid positions
+- Leverage calculation
+- Price parsing
+- Position side detection
 
-Target coverage:
-- [ ] Protocol detection: 100%
-- [ ] Position discovery: 100%
-- [ ] Position expansion: 90%+
-- [ ] Token extraction: 90%+
-- [ ] Database saves: 95%+
-- [ ] Error handling: 80%+
+**test-aave-deduplication.js** (5 tests)
+- Duplicate position detection
+- Merge logic for Aave supplies/borrows
+- Health factor calculations
 
-## Contributing Tests
+**test-price-slider.js** (8 tests)
+- Price range slider positioning
+- Liquidation price calculations
+- Health status determination (safe/warning/critical)
 
-When adding new features, please:
+### Token Exposure Tests
 
-1. Add test cases to test-batch-extraction.js
-2. Update this README
-3. Test manually before committing
-4. Document any edge cases
-5. Add debugging tips for failures
+**test-token-exposure.js** (8 tests)
+- CLM token aggregation
+- Hedge net exposure calculation
+- Token consolidation (BTC, ETH, USD groups)
+- CoinGecko mapping validation
+- Formatting and display logic
 
-## Test Data
+**test-token-card-fix.js** (validation)
+- ETH consolidation bug fix (whETH variant)
+- USD value calculation fix
+- Net Exposure column addition
 
-### Sample Orca Position Data
+---
 
-```javascript
-{
-  pair: "SOL/USDC",
-  protocol: "Orca",
-  balance: 1234.56,
-  token0: "SOL",
-  token1: "USDC",
-  token0Amount: 5.234,
-  token1Amount: 1043.21,
-  token0Percentage: 45.2,
-  token1Percentage: 54.8
-}
-```
+## 📚 Test Documentation
 
-### Sample Uniswap Position Data
+For detailed test results and examples, see:
+- [TOKEN_EXPOSURE_FEATURE.md](../docs/TOKEN_EXPOSURE_FEATURE.md) - Feature documentation with test results
+- [CHANGELOG-v1.5.1.md](../docs/CHANGELOG-v1.5.1.md) - Bug fixes and improvements
+- [TOKEN_EXPOSURE_v1.5.1.md](../docs/TOKEN_EXPOSURE_v1.5.1.md) - Current implementation guide
 
-```javascript
-{
-  pair: "ETH/USDC",
-  protocol: "Uniswap",
-  balance: 5678.90,
-  token0: "ETH",
-  token1: "USDC",
-  token0Amount: 1.234,
-  token1Amount: 3456.78,
-  token0Percentage: 52.1,
-  token1Percentage: 47.9
-}
-```
+---
 
-## Known Issues
-
-1. **Drawer animation timing** - Sometimes drawer closes too fast for screenshot
-   - Workaround: Increase wait time from 800ms to 1000ms
-
-2. **Multiple drawers** - If previous drawer didn't close, new one might not open
-   - Workaround: Always verify drawer closed before next expansion
-
-3. **Rate limiting** - Anthropic API has rate limits (50 req/min)
-   - Workaround: Add delay between batches if needed
-
-## Support
-
-For test failures or questions:
-1. Check console logs
-2. Review this README
-3. Try manual testing
-4. Report issue with test output
+**Version:** 1.5.1
+**Last Updated:** November 17, 2025
+**Test Count:** 30 tests (100% passing)
